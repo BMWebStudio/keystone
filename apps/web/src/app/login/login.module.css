@@ -1,0 +1,78 @@
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.8fr);
+}
+
+.login-page > section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 34rem;
+  width: 100%;
+  margin: auto;
+  padding: var(--space-8);
+}
+
+.brand-link {
+  position: absolute;
+  top: var(--space-6);
+  color: var(--brand-700);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.login-page h1 {
+  margin: 0.3rem 0;
+  font-size: var(--heading-md);
+  line-height: 1.1;
+}
+
+.login-page section > div > p {
+  margin: 0;
+  color: var(--brand-600);
+  font-weight: 850;
+}
+
+.login-page section > div > span,
+.login-page section > small {
+  color: var(--text-muted);
+}
+
+.login-page form {
+  display: grid;
+  gap: var(--space-5);
+  margin: var(--space-8) 0 var(--space-4);
+}
+
+.login-page aside {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--space-12);
+  background: var(--brand-900);
+  color: white;
+}
+
+.login-page aside p {
+  max-width: 28rem;
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  font-weight: 850;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.login-page aside span {
+  max-width: 27rem;
+  color: var(--brand-200);
+}
+
+@media (max-width: 800px) {
+  .login-page {
+    grid-template-columns: 1fr;
+  }
+
+  .login-page aside {
+    display: none;
+  }
+}

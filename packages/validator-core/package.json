@@ -1,0 +1,10 @@
+{
+  "name": "@a11y/validator-core",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "mkdir -p dist && cp src/*.js dist/",
+    "test": "node --test"
+  }
+}

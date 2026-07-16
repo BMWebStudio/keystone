@@ -1,0 +1,35 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.page-header p {
+  margin: 0 0 var(--space-2);
+  color: var(--brand-600);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: var(--heading-sm);
+  letter-spacing: -0.03em;
+}
+
+.page-header span {
+  display: block;
+  margin-top: var(--space-2);
+  max-width: 42rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 720px) {
+  .page-header {
+    flex-direction: column;
+  }
+}

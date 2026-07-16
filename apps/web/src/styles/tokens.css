@@ -1,0 +1,66 @@
+:root {
+  --brand-50: #f4f7ff;
+  --brand-100: #e7edff;
+  --brand-200: #cbd7ff;
+  --brand-500: #526fd7;
+  --brand-600: #405ab8;
+  --brand-700: #354a96;
+  --brand-900: #202b53;
+  --accent-100: #fff1d3;
+  --accent-400: #efbd5b;
+  --accent-500: #dca33d;
+  --neutral-0: #fff;
+  --neutral-50: #f8f8f5;
+  --neutral-100: #efefe9;
+  --neutral-200: #deded5;
+  --neutral-400: #a2a29a;
+  --neutral-600: #65655e;
+  --neutral-700: #474741;
+  --neutral-900: #20201d;
+  --success-100: #e7f6ed;
+  --success-700: #17643a;
+  --warning-100: #fff3d8;
+  --warning-700: #7d5600;
+  --danger-100: #fdebec;
+  --danger-700: #a42c35;
+  --info-100: #eaf2ff;
+  --info-700: #285ca4;
+  --surface-page: var(--neutral-50);
+  --surface-panel: var(--neutral-0);
+  --surface-muted: var(--neutral-100);
+  --text-primary: var(--neutral-900);
+  --text-secondary: var(--neutral-700);
+  --text-muted: var(--neutral-600);
+  --border-default: var(--neutral-200);
+  --border-focus: var(--brand-600);
+  --font-body:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-mono:
+    "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --heading-sm: clamp(1.35rem, 2vw, 1.75rem);
+  --heading-md: clamp(1.8rem, 3vw, 2.55rem);
+  --heading-lg: clamp(2.4rem, 5vw, 4.5rem);
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --radius-sm: 0.4rem;
+  --radius-md: 0.7rem;
+  --radius-lg: 1rem;
+  --shadow-sm: 0 1px 2px rgb(25 25 20 / 0.06);
+  --shadow-md: 0 16px 40px rgb(30 32 40 / 0.09);
+  --sidebar-width: 17rem;
+  --content-max: 88rem;
+}
