@@ -3,8 +3,17 @@
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
+  "module": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./a11y-validator.js": "./dist/a11y-validator.js"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
-    "build": "mkdir -p dist && cp src/*.js dist/",
-    "test": "node --test"
+    "build": "node ./scripts/build.mjs",
+    "test": "node --test test/*.test.js"
   }
 }

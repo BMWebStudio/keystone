@@ -1,1 +1,107 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Validator example</title><style>body{font:16px system-ui;max-width:42rem;margin:3rem auto;padding:1rem}form{display:grid;gap:1rem}label{font-weight:700}input,textarea,button{font:inherit;padding:.7rem}.a11y-field-error{color:#a42c35;margin:.25rem 0}.a11y-error-summary{padding:1rem;background:#fdebec;border-left:4px solid #a42c35}</style></head><body><h1>Contact us</h1><form data-a11y-form><div><label for="name">Name</label><input id="name" name="name" required data-a11y-message-required="Enter your name."></div><div><label for="email">Email</label><input id="email" name="email" type="email" required></div><div><label for="message">Message</label><textarea id="message" name="message"></textarea></div><button>Send</button></form><script type="module">import{createValidator}from'../../packages/validator-core/src/index.js';createValidator().init();</script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Validator example</title>
+    <style>
+      body {
+        font: 16px system-ui, sans-serif;
+        max-width: 42rem;
+        margin: 3rem auto;
+        padding: 1rem;
+      }
+      form {
+        display: grid;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      label {
+        font-weight: 700;
+        display: block;
+        margin-bottom: 0.35rem;
+      }
+      input,
+      textarea,
+      button {
+        font: inherit;
+        padding: 0.7rem;
+      }
+      .a11y-field-error {
+        color: #a42c35;
+        margin: 0.25rem 0;
+      }
+      .a11y-error-summary {
+        padding: 1rem;
+        background: #fdebec;
+        border-left: 4px solid #a42c35;
+      }
+      pre {
+        overflow: auto;
+        padding: 1rem;
+        background: #202b53;
+        color: #e7edff;
+        border-radius: 0.4rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Contact us</h1>
+    <p>
+      This page loads the universal validator. It tracks every form, validates
+      on submit/blur, and scans for broken field markup.
+    </p>
+
+    <form>
+      <div>
+        <label for="name">Name</label>
+        <input
+          id="name"
+          name="name"
+          required
+          data-a11y-message-required="Enter your name."
+        />
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required />
+      </div>
+      <div>
+        <label for="message">Message</label>
+        <textarea id="message" name="message"></textarea>
+      </div>
+      <button type="submit">Send</button>
+    </form>
+
+    <form>
+      <p>Broken demo form (missing labels on purpose)</p>
+      <input name="orphan" required />
+      <button type="submit">Submit orphan field</button>
+    </form>
+
+    <!--
+      Production install (served by the Next app):
+      <script src="http://localhost:3000/validator/a11y-validator.js" data-a11y-project="proj_xxx" defer></script>
+    -->
+    <script type="module">
+      import {
+        createValidator,
+        scanDocument,
+        summarizeScan,
+      } from "../../packages/validator-core/src/index.js";
+
+      const validator = createValidator().init();
+      const report = summarizeScan(scanDocument());
+      console.info("Tracked forms", validator.listForms());
+      console.info("Scan report", report);
+
+      const out = document.createElement("pre");
+      out.textContent = JSON.stringify(
+        { forms: validator.listForms(), scan: report },
+        null,
+        2,
+      );
+      document.body.append(out);
+    </script>
+  </body>
+</html>

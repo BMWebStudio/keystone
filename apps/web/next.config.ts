@@ -7,40 +7,35 @@ type CssLoader = {
   };
 };
 
-type OneOfRule = {
-  use?: CssLoader | CssLoader[];
-};
-
 const nextConfig: NextConfig = {
   experimental: { optimizePackageImports: [] },
   webpack: (config) => {
-    const oneOf = config.module.rules.find(
-      (rule): rule is { oneOf: OneOfRule[] } =>
-        typeof rule === "object" &&
-        rule !== null &&
-        "oneOf" in rule &&
-        Array.isArray(rule.oneOf),
-    )?.oneOf;
+    const rules = (config.module?.rules ?? []) as Array<Record<string, unknown>>;
+    const oneOfRule = rules.find(
+      (rule) => Array.isArray(rule.oneOf),
+    ) as { oneOf?: Array<{ use?: unknown }> } | undefined;
 
-    oneOf
+    oneOfRule?.oneOf
       ?.filter((rule) => Array.isArray(rule.use))
       .forEach((rule) => {
-        (rule.use as CssLoader[]).forEach((loader) => {
+        for (const entry of rule.use as unknown[]) {
+          const loader = entry as CssLoader;
           if (
-            loader.loader?.includes("css-loader") &&
-            !loader.loader.includes("postcss-loader") &&
-            loader.options?.modules
+            !loader?.loader?.includes("css-loader") ||
+            loader.loader.includes("postcss-loader") ||
+            !loader.options?.modules
           ) {
-            loader.options.modules = {
-              ...loader.options.modules,
-              getLocalIdent: (
-                _context: unknown,
-                _localIdentName: string,
-                localName: string,
-              ) => localName,
-            };
+            continue;
           }
-        });
+          loader.options.modules = {
+            ...loader.options.modules,
+            getLocalIdent: (
+              _context: unknown,
+              _localIdentName: string,
+              localName: string,
+            ) => localName,
+          };
+        }
       });
 
     return config;

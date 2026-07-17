@@ -1,0 +1,27 @@
+.project-list {
+  display: grid;
+}
+
+.project-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--border-default);
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-item:last-child {
+  border-bottom: 0;
+}
+
+.project-item span {
+  display: grid;
+}
+
+.project-item small {
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}

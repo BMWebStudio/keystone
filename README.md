@@ -1,15 +1,13 @@
 # A11y Form Validator
 
-A full-stack bootcamp capstone foundation combining a reusable accessible form-validation engine with a custom Next.js dashboard and Supabase backend.
+Universal accessible form validation for any HTML site—plus a Next.js dashboard and Supabase backend. Unlike the Webflow Designer Extension / OAuth app, this validator is platform-agnostic: drop in one script and it tracks forms wherever they render.
 
 ## Included
 
-- BM Web Studio–inspired design tokens and responsive app shell
-- Reusable UI, form, layout, and product components
-- Landing page, dashboard, project detail, login, and interactive playground
-- Framework-independent JavaScript validator
-- Supabase PostgreSQL schema, indexes, trigger, and Row Level Security
-- Public configuration Route Handler
+- Framework-independent browser validator (`packages/validator-core`)
+- Drop-in script that discovers forms, validates fields, and scans for broken markup
+- BM Web Studio–inspired dashboard (projects, scans, playground, settings)
+- Supabase schema, RLS, and public project config API
 - Plain HTML integration example
 
 ## Start
@@ -20,17 +18,25 @@ npm install
 npm run dev
 ```
 
-Add Supabase environment variables and apply `supabase/migrations/001_initial_schema.sql`.
+Apply `supabase/migrations/*.sql`, then set Supabase env vars.
+
+## Install on any site
+
+```html
+<script
+  src="http://localhost:3000/validator/a11y-validator.js"
+  data-a11y-project="proj_your_public_key"
+  defer
+></script>
+```
+
+The script:
+
+1. Loads remote config from `/api/public/config/:publicKey`
+2. Tracks every `<form>` (opt out with `data-a11y-ignore-form`)
+3. Validates native constraints (`required`, `type="email"`, `minlength`, `pattern`, …)
+4. Scans for missing labels, ungrouped radios/checkboxes, duplicate ids, and missing submit controls
 
 ## Current scope
 
-This is a polished working foundation. UI routes use demonstration data so the visual system can be reviewed immediately. The database, Supabase clients, public configuration route, and browser validator are scaffolded for integration.
-
-## Next implementation tasks
-
-1. Connect login/registration to Supabase Auth.
-2. Replace dashboard demo data with authenticated queries.
-3. Add project Server Actions with Zod validation.
-4. Bundle `validator-core` with tsup.
-5. Add Vitest, React Testing Library, Playwright, and axe-core.
-6. Implement scan-rule modules and persisted reports.
+UI routes use demonstration data so the visual system can be reviewed immediately. Auth, live project CRUD, and persisted scan storage are the next wiring steps.

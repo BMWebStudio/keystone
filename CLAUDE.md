@@ -36,11 +36,10 @@ Two independent layers that share no runtime code:
 ### `packages/validator-core`
 Framework-independent browser JavaScript. No React, no Next.js, no Supabase dependencies.
 
-- `src/index.js` — `createValidator(options?)` factory. Attaches submit/blur listeners to `form[data-a11y-form]` elements. Injects `<p class="a11y-field-error">` inline errors and a `<div data-a11y-error-summary>` summary block. Manages `aria-invalid` and `aria-describedby` without clobbering existing references.
-- `src/rules.js` — `inferRules(field)` derives which rules to run from native HTML attributes (`required`, `type="email"`, `minlength`, `maxlength`, `pattern`). `rules` map contains the validators.
-- Custom error messages via `data-a11y-message-{rule}` attributes on fields, or global `messages` option.
-- Also exposes `window.A11yFormValidator` for plain `<script>` usage.
-- Build is a manual `cp src/*.js dist/` — no bundler yet. tsup is planned.
+- `src/index.js` — `createValidator(options?)` factory. Discovers `form:not([data-a11y-ignore-form])` by default. Injects inline errors and an error summary. Manages `aria-invalid` / `aria-describedby` without clobbering existing refs. Also exposes `autoInit()`, `listForms()`, and remote config loading via `data-a11y-project`.
+- `src/rules.js` — `inferRules(field)` from native HTML attributes.
+- `src/scan.js` — markup scan for missing labels, ungrouped options, duplicate ids, missing submit controls.
+- Build produces ESM in `dist/` plus drop-in `dist/a11y-validator.js` (IIFE). Synced to `apps/web/public/validator/` on web predev/prebuild.
 
 ### `apps/web`
 Next.js 15 / React 19 / TypeScript dashboard. App Router only.

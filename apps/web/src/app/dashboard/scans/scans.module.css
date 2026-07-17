@@ -1,0 +1,36 @@
+.scan-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+  gap: var(--space-6);
+}
+
+.scan-meta {
+  margin: 0;
+}
+
+.scan-meta div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.scan-meta div:last-child {
+  border-bottom: 0;
+}
+
+.scan-meta dt {
+  color: var(--text-muted);
+}
+
+.scan-meta dd {
+  margin: 0;
+  font-weight: 750;
+}
+
+@media (max-width: 850px) {
+  .scan-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -3,12 +3,16 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
+    "predev": "npm run build --workspace=@a11y/validator-core && node ./scripts/sync-validator.mjs",
+    "prebuild": "npm run build --workspace=@a11y/validator-core && node ./scripts/sync-validator.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sync:validator": "node ./scripts/sync-validator.mjs"
   },
   "dependencies": {
+    "@a11y/validator-core": "*",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.1",
     "next": "^15.2.3",
