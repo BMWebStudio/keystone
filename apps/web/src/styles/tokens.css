@@ -50,6 +50,7 @@
   --text-base: 1rem;
   --text-lg: 1.125rem;
   --text-xl: 1.25rem;
+  --text-descriptor: clamp(0.675rem, 1.75vw, var(--text-sm));
   --heading-sm: clamp(1.35rem, 2vw, 1.75rem);
   --heading-md: clamp(1.8rem, 3vw, 2.55rem);
   --heading-lg: clamp(2.4rem, 5vw, 4.5rem);
@@ -63,6 +64,8 @@
   --space-10: 2.5rem;
   --space-12: 3rem;
   --space-16: 4rem;
+  --space-18: 4.5rem;
+  --space-21: 5.25rem;
   --radius-sm: 0.4rem;
   --radius-md: 0.7rem;
   --radius-lg: 1rem;

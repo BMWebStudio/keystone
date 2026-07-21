@@ -56,7 +56,7 @@
 
 .hero {
   max-width: 74rem;
-  padding: clamp(4rem, 9vw, 8rem) clamp(1.25rem, 5vw, 5rem);
+  padding: var(--space-18) clamp(1.25rem, 5vw, 5rem) var(--space-21);
 }
 
 .hero h1 {
@@ -69,7 +69,7 @@
 .hero-descriptor {
   margin: var(--space-4) 0 0;
   color: var(--brand-600);
-  font-size: var(--text-sm);
+  font-size: var(--text-descriptor);
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;

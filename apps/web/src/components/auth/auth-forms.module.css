@@ -18,6 +18,11 @@
   border: 1px solid var(--success-200, #bbf7d0);
 }
 
+.profile-form {
+  display: grid;
+  gap: var(--space-5);
+}
+
 .form-footer {
   margin: var(--space-4) 0 0;
   color: var(--text-muted);

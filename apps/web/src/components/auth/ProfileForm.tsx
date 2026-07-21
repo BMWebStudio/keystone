@@ -66,7 +66,7 @@ export function ProfileForm({
           {successMessage}
         </p>
       )}
-      <form onSubmit={handleSubmit}>
+      <form className={styles["profile-form"]} onSubmit={handleSubmit}>
         <FormField
           id="display-name"
           label="Display name"

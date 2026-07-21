@@ -19,7 +19,6 @@
   align-items: center;
   gap: var(--space-3);
   align-self: flex-start;
-  margin-bottom: var(--space-10);
   color: var(--text-primary);
   font-weight: 900;
   line-height: 1.1;
