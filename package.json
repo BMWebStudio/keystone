@@ -1,5 +1,5 @@
 {
-  "name": "a11y-form-validator",
+  "name": "keystone",
   "private": true,
   "version": "0.1.0",
   "workspaces": [
@@ -10,7 +10,13 @@
     "dev": "npm run dev --workspace=@a11y/web",
     "build": "npm run build --workspace=@a11y/validator-core && npm run build --workspace=@a11y/web",
     "test": "npm run test --workspaces --if-present",
-    "format": "prettier --write \"apps/**/*.{ts,tsx,js,jsx,css,json,md}\" \"packages/**/*.{ts,tsx,js,jsx,css,json,md}\" \"docs/**/*.{md,mdx}\" \"README.md\""
+    "format": "prettier --write \"apps/**/*.{ts,tsx,js,jsx,css,json,md}\" \"packages/**/*.{ts,tsx,js,jsx,css,json,md}\" \"docs/**/*.{md,mdx}\" \"README.md\"",
+    "capture:area": "node scripts/capture.mjs area",
+    "capture:fullscreen": "node scripts/capture.mjs fullscreen",
+    "capture:window": "node scripts/capture.mjs window",
+    "capture:record": "node scripts/capture.mjs record",
+    "capture:scroll": "node scripts/capture.mjs scroll",
+    "capture:history": "node scripts/capture.mjs history"
   },
   "devDependencies": {
     "prettier": "^3.9.5"

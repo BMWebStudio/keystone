@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { FormField } from "@/components/forms/FormField";
-import { Button } from "@/components/ui/Button";
+import { Suspense } from "react";
+import { LoginForm } from "@/components/auth/LoginForm";
 import styles from "./login.module.css";
 
 export default function Login() {
@@ -8,7 +8,7 @@ export default function Login() {
     <main className={styles["login-page"]}>
       <section>
         <Link href="/" className={styles["brand-link"]}>
-          BM / A11y Validator
+          BM / Keystone
         </Link>
         <div>
           <p>Welcome back</p>
@@ -18,20 +18,9 @@ export default function Login() {
             settings.
           </span>
         </div>
-        <form>
-          <FormField id="email" label="Email address">
-            <input type="email" name="email" autoComplete="email" />
-          </FormField>
-          <FormField id="password" label="Password">
-            <input
-              type="password"
-              name="password"
-              autoComplete="current-password"
-            />
-          </FormField>
-          <Button type="submit">Sign in</Button>
-        </form>
-        <small>Demo foundation: connect this form to Supabase Auth.</small>
+        <Suspense fallback={<p>Loading sign-in form…</p>}>
+          <LoginForm />
+        </Suspense>
       </section>
       <aside>
         <p>

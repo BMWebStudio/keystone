@@ -1,37 +1,83 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { MetricCard } from "@/components/app/MetricCard";
 import { IssueCard } from "@/components/app/IssueCard";
+import {
+  getDashboardOverviewData,
+  greetingForHour,
+  overviewDescription,
+  projectStatusBadge,
+} from "@/lib/dashboard/queries";
+import { createClient } from "@/lib/supabase/server";
 import styles from "./dashboard.module.css";
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const data = await getDashboardOverviewData(
+    supabase,
+    user.id,
+    user.email,
+  );
+
   return (
     <>
       <PageHeader
         eyebrow="Workspace overview"
-        title="Good evening, Brandon."
-        description="Your forms are in good shape. Three items need attention before your next release."
-        actions={<Button>Create project</Button>}
+        title={`${greetingForHour()}, ${data.displayName}.`}
+        description={overviewDescription(data)}
+        actions={
+          <Link className={styles["header-action"]} href="/dashboard/projects">
+            Create project
+          </Link>
+        }
       />
       <section className={styles["metrics-grid"]} aria-label="Project metrics">
-        <MetricCard label="Active projects" value="3" detail="Across 7 forms" />
+        <MetricCard
+          label="Active projects"
+          value={String(data.metrics.activeProjects)}
+          detail={
+            data.projects.length
+              ? `${data.projects.length} total in workspace`
+              : "None yet"
+          }
+        />
         <MetricCard
           label="Open issues"
-          value="5"
-          detail="2 errors, 3 warnings"
+          value={String(data.metrics.openIssues)}
+          detail={
+            data.metrics.openIssues
+              ? "From latest scans per project"
+              : "No scan issues recorded"
+          }
         />
         <MetricCard
           label="Checks passed"
-          value="94%"
-          detail="Up 8% this week"
+          value={
+            data.metrics.checksPassedPercent === null
+              ? "—"
+              : `${data.metrics.checksPassedPercent}%`
+          }
+          detail={
+            data.metrics.checksPassedPercent === null
+              ? "Run scans to calculate pass rate"
+              : "Based on latest scan totals"
+          }
         />
         <MetricCard
           label="Events today"
-          value="128"
-          detail="No sensitive values stored"
+          value={String(data.metrics.eventsToday)}
+          detail="Validation events across your projects"
         />
       </section>
       <section className={styles["content-grid"]}>
@@ -41,67 +87,70 @@ export default function Dashboard() {
             meta={<Link href="/dashboard/projects">View all</Link>}
           />
           <CardContent>
-            <div className={styles["project-list"]}>
-              {[
-                ["MassCOSH", "masscosh.org", "3 forms", "warning", "4 issues"],
-                [
-                  "BM Web Studio",
-                  "bmwebstudio.com",
-                  "2 forms",
-                  "success",
-                  "No critical issues",
-                ],
-                ["Demo checkout", "localhost", "2 forms", "danger", "1 error"],
-              ].map(([name, domain, forms, tone, status]) => (
-                <Link
-                  href="/dashboard/projects/demo"
-                  className={styles["project-item"]}
-                  key={name}
-                >
-                  <span>
-                    <strong>{name}</strong>
-                    <small>
-                      {domain} · {forms}
-                    </small>
-                  </span>
-                  <Badge tone={tone as "warning" | "success" | "danger"}>
-                    {status}
-                  </Badge>
-                </Link>
-              ))}
-            </div>
+            {!data.recentProjects.length ? (
+              <p className={styles["empty-state"]}>
+                No projects yet.{" "}
+                <Link href="/dashboard/projects">Create your first project</Link>{" "}
+                to get an embed key.
+              </p>
+            ) : (
+              <div className={styles["project-list"]}>
+                {data.recentProjects.map((project) => {
+                  const status = projectStatusBadge(project);
+                  return (
+                    <Link
+                      href={`/dashboard/projects/${project.id}`}
+                      className={styles["project-item"]}
+                      key={project.id}
+                    >
+                      <span>
+                        <strong>{project.name}</strong>
+                        <small>
+                          {project.domain || "No domain"} ·{" "}
+                          {project.is_active ? "Active" : "Inactive"}
+                        </small>
+                      </span>
+                      <Badge tone={status.tone}>{status.label}</Badge>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
         <Card>
           <CardHeader
             title="Needs attention"
-            meta={<Badge tone="warning">3 items</Badge>}
+            meta={
+              data.attentionIssues.length ? (
+                <Badge tone="warning">
+                  {data.attentionIssues.length} item
+                  {data.attentionIssues.length === 1 ? "" : "s"}
+                </Badge>
+              ) : (
+                <Badge tone="success">Clear</Badge>
+              )
+            }
           />
           <CardContent>
-            <IssueCard
-              severity="error"
-              title="Email input has no accessible label"
-              selector="#newsletter-email"
-            >
-              Add a visible label or a programmatically associated accessible
-              name.
-            </IssueCard>
-            <IssueCard
-              severity="warning"
-              title="Radio options are not grouped"
-              selector="[name='format']"
-            >
-              Wrap related choices in a fieldset and describe them with a
-              legend.
-            </IssueCard>
-            <IssueCard
-              severity="manual"
-              title="Confirm instructions are understandable"
-              selector="#contact-form"
-            >
-              Automated checks cannot determine whether the helper copy is clear
-              enough.
-            </IssueCard>
+            {!data.attentionIssues.length ? (
+              <p className={styles["empty-state"]}>
+                {data.projects.length
+                  ? "No open findings in your latest scans."
+                  : "Create a project and record a scan to see findings here."}
+              </p>
+            ) : (
+              data.attentionIssues.map((issue) => (
+                <IssueCard
+                  key={`${issue.selector}-${issue.title}`}
+                  severity={issue.severity}
+                  title={issue.title}
+                  selector={issue.selector}
+                >
+                  {issue.message}
+                </IssueCard>
+              ))
+            )}
           </CardContent>
         </Card>
       </section>

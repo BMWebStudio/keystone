@@ -5,8 +5,11 @@ export default function Home() {
   return (
     <main className={styles["landing-page"]}>
       <nav>
-        <strong>BM / A11y Validator</strong>
-        <Link href="/login">Sign in</Link>
+        <strong>BM / Keystone</strong>
+        <div className={styles["nav-links"]}>
+          <Link href="/login">Sign in</Link>
+          <Link href="/register">Create account</Link>
+        </div>
       </nav>
       <section className={styles.hero}>
         <p>Platform-independent form accessibility</p>
@@ -22,8 +25,8 @@ export default function Home() {
           rebuilding your forms or locking into one platform.
         </span>
         <div>
-          <Link className={styles["cta-primary"]} href="/dashboard">
-            Open demo dashboard
+          <Link className={styles["cta-primary"]} href="/register">
+            Create free account
           </Link>
           <Link
             className={styles["cta-secondary"]}

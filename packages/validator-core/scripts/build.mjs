@@ -25,7 +25,7 @@ const index = stripExports(readFileSync(join(src, "index.js"), "utf8"))
   .replace(/const api = \{[\s\S]*?\};\n*/, "")
   .replace(/if \(typeof window !== "undefined"\) \{[\s\S]*?\}\n*/, "");
 
-const bundle = `/*! A11y Form Validator — universal browser build */
+const bundle = `/*! Keystone — universal browser build */
 (function (global) {
 ${rules}
 ${scan}
@@ -34,10 +34,11 @@ ${index}
     createValidator,
     autoInit,
     fetchProjectConfig,
+    saveScanReport,
     scanDocument,
     summarizeScan,
   };
-  global.A11yFormValidator = api;
+  global.Keystone = api;
   const script = document.currentScript;
   if (script && (script.dataset.a11yProject || script.hasAttribute("data-a11y-auto"))) {
     autoInit();

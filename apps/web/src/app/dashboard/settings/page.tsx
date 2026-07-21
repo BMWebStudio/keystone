@@ -1,51 +1,52 @@
+import { redirect } from "next/navigation";
+import { ProfileForm } from "@/components/auth/ProfileForm";
+import { SignOutButton } from "@/components/auth/SignOutButton";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { FormField } from "@/components/forms/FormField";
+import { createClient } from "@/lib/supabase/server";
 import styles from "./settings.module.css";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const { count: projectCount } = await supabase
+    .from("projects")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
   return (
     <>
       <PageHeader
         eyebrow="Account"
         title="Settings"
         description="Manage your profile and default validation behavior for new projects."
-        actions={<Button type="button">Save changes</Button>}
       />
 
       <div className={styles["settings-grid"]}>
         <Card>
-          <CardHeader title="Profile" meta={<Badge tone="info">Demo</Badge>} />
+          <CardHeader title="Profile" />
           <CardContent>
-            <form className={styles["settings-form"]}>
-              <FormField
-                id="display-name"
-                label="Display name"
-                description="Shown in the dashboard greeting and shared project views."
-              >
-                <input
-                  name="displayName"
-                  defaultValue="Brandon"
-                  autoComplete="name"
-                />
-              </FormField>
-              <FormField
-                id="email"
-                label="Email address"
-                description="Sign-in address for this workspace."
-              >
-                <input
-                  name="email"
-                  type="email"
-                  defaultValue="brandon@bmwebstudio.com"
-                  autoComplete="email"
-                  readOnly
-                />
-              </FormField>
-              <Button type="submit">Update profile</Button>
-            </form>
+            <ProfileForm
+              userId={user.id}
+              email={user.email ?? ""}
+              initialDisplayName={profile?.display_name ?? ""}
+            />
           </CardContent>
         </Card>
 
@@ -87,7 +88,12 @@ export default function SettingsPage() {
                   <option value="enabled">Enabled</option>
                 </select>
               </FormField>
-              <Button type="submit">Save defaults</Button>
+              <Button type="button" disabled>
+                Save defaults
+              </Button>
+              <p className={styles["settings-note"]}>
+                Default project settings will be saved here in a later update.
+              </p>
             </form>
           </CardContent>
         </Card>
@@ -97,25 +103,24 @@ export default function SettingsPage() {
           <CardContent>
             <dl className={styles["settings-meta"]}>
               <div>
-                <dt>Plan</dt>
-                <dd>Foundation / demo</dd>
+                <dt>Email</dt>
+                <dd>{user.email}</dd>
               </div>
               <div>
                 <dt>Projects</dt>
-                <dd>3 active</dd>
+                <dd>{projectCount ?? 0} active</dd>
               </div>
               <div>
-                <dt>Auth</dt>
-                <dd>Connect to Supabase Auth to persist profile changes</dd>
+                <dt>Member since</dt>
+                <dd>
+                  {user.created_at
+                    ? new Date(user.created_at).toLocaleDateString()
+                    : "—"}
+                </dd>
               </div>
             </dl>
             <div className={styles["settings-actions"]}>
-              <Button variant="secondary" type="button">
-                Export project configs
-              </Button>
-              <Button variant="danger" type="button">
-                Sign out
-              </Button>
+              <SignOutButton />
             </div>
           </CardContent>
         </Card>

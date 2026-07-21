@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "A11y Form Validator",
+  title: "Keystone",
   description:
     "Platform-independent accessible form validation by BM Web Studio.",
 };

@@ -1,0 +1,329 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { type FormEvent, useState } from "react";
+import { FormField } from "@/components/forms/FormField";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Card, CardContent, CardHeader } from "@/components/ui/Card";
+import styles from "./projects-forms.module.css";
+import detailStyles from "@/app/dashboard/projects/[projectId]/project.module.css";
+import {
+  DEFAULT_VALIDATION_MESSAGES,
+  mergeValidationMessages,
+  VALIDATION_MESSAGE_KEYS,
+  VALIDATION_MESSAGE_LABELS,
+  type ValidationMessages,
+} from "@/lib/validations/messages";
+
+type ProjectSettings = {
+  validation_mode: string;
+  show_error_summary: boolean;
+  disable_native_validation: boolean;
+  messages?: ValidationMessages | null;
+};
+
+export type ProjectDetailData = {
+  id: string;
+  name: string;
+  domain: string | null;
+  public_key: string;
+  is_active: boolean;
+  project_settings: ProjectSettings | ProjectSettings[] | null;
+};
+
+function getSettings(
+  settings: ProjectSettings | ProjectSettings[] | null,
+): ProjectSettings {
+  if (Array.isArray(settings)) {
+    return settings[0] ?? {
+      validation_mode: "submit",
+      show_error_summary: true,
+      disable_native_validation: true,
+    };
+  }
+
+  return (
+    settings ?? {
+      validation_mode: "submit",
+      show_error_summary: true,
+      disable_native_validation: true,
+    }
+  );
+}
+
+export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) {
+  const router = useRouter();
+  const settings = getSettings(project.project_settings);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const snippet = `<script
+  src="${appUrl}/validator/a11y-validator.js"
+  data-a11y-project="${project.public_key}"
+  defer
+></script>`;
+
+  const [name, setName] = useState(project.name);
+  const [domain, setDomain] = useState(project.domain ?? "");
+  const [validationMode, setValidationMode] = useState(settings.validation_mode);
+  const [showErrorSummary, setShowErrorSummary] = useState(
+    settings.show_error_summary ? "enabled" : "disabled",
+  );
+  const [disableNativeValidation, setDisableNativeValidation] = useState(
+    settings.disable_native_validation ? "disabled" : "enabled",
+  );
+  const [messages, setMessages] = useState(() =>
+    mergeValidationMessages(settings.messages),
+  );
+  const [formError, setFormError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [copyMessage, setCopyMessage] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  async function handleSave(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setFormError(null);
+    setSuccessMessage(null);
+
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setFormError("Project name is required.");
+      return;
+    }
+
+    setIsSaving(true);
+
+    const response = await fetch(`/api/projects/${project.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: trimmedName,
+        domain: domain.trim() || null,
+        validation_mode: validationMode,
+        show_error_summary: showErrorSummary === "enabled",
+        disable_native_validation: disableNativeValidation === "disabled",
+        messages,
+      }),
+    });
+
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      setFormError(payload.error ?? "Could not update project.");
+      setIsSaving(false);
+      return;
+    }
+
+    setSuccessMessage("Project updated.");
+    setIsSaving(false);
+    router.refresh();
+  }
+
+  async function handleDelete() {
+    setFormError(null);
+    setIsDeleting(true);
+
+    const response = await fetch(`/api/projects/${project.id}`, {
+      method: "DELETE",
+    });
+
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      setFormError(payload.error ?? "Could not delete project.");
+      setIsDeleting(false);
+      setConfirmDelete(false);
+      return;
+    }
+
+    router.push("/dashboard/projects");
+    router.refresh();
+  }
+
+  async function handleCopySnippet() {
+    try {
+      await navigator.clipboard.writeText(snippet);
+      setCopyMessage("Snippet copied.");
+    } catch {
+      setCopyMessage("Could not copy snippet.");
+    }
+  }
+
+  return (
+    <>
+      {formError && (
+        <p className={styles["form-message-error"]} role="alert">
+          {formError}
+        </p>
+      )}
+      {successMessage && (
+        <p className={styles["form-message-success"]} role="status">
+          {successMessage}
+        </p>
+      )}
+
+      <form className={detailStyles["project-layout"]} onSubmit={handleSave}>
+        <div className={detailStyles["project-grid-top"]}>
+          <Card>
+            <CardHeader
+              title="Project details"
+              meta={
+                <Badge tone={project.is_active ? "success" : "warning"}>
+                  {project.is_active ? "Active" : "Inactive"}
+                </Badge>
+              }
+            />
+            <CardContent>
+              <div className={styles["project-form"]}>
+                <FormField id="edit-name" label="Project name" required>
+                  <input
+                    name="name"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                  />
+                </FormField>
+                <FormField id="edit-domain" label="Domain">
+                  <input
+                    name="domain"
+                    value={domain}
+                    onChange={(event) => setDomain(event.target.value)}
+                  />
+                </FormField>
+                <FormField id="edit-validation-mode" label="Validation mode">
+                  <select
+                    name="validationMode"
+                    value={validationMode}
+                    onChange={(event) => setValidationMode(event.target.value)}
+                  >
+                    <option value="submit">Submit only</option>
+                    <option value="blur">Blur + submit</option>
+                    <option value="change">Change + submit</option>
+                  </select>
+                </FormField>
+                <FormField id="edit-error-summary" label="Error summary">
+                  <select
+                    name="showErrorSummary"
+                    value={showErrorSummary}
+                    onChange={(event) => setShowErrorSummary(event.target.value)}
+                  >
+                    <option value="enabled">Enabled</option>
+                    <option value="disabled">Disabled</option>
+                  </select>
+                </FormField>
+                <FormField
+                  id="edit-native-validation"
+                  label="Browser native validation"
+                >
+                  <select
+                    name="disableNativeValidation"
+                    value={disableNativeValidation}
+                    onChange={(event) =>
+                      setDisableNativeValidation(event.target.value)
+                    }
+                  >
+                    <option value="disabled">Disabled (recommended)</option>
+                    <option value="enabled">Enabled</option>
+                  </select>
+                </FormField>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader title="Installation" />
+            <CardContent>
+              <p>
+                Add the script before the closing body tag. It discovers every
+                form on the page and loads settings from your public project key.
+              </p>
+              <dl>
+                <div>
+                  <dt>Public key</dt>
+                  <dd>{project.public_key}</dd>
+                </div>
+              </dl>
+              <pre>
+                <code>{snippet}</code>
+              </pre>
+              <Button size="sm" type="button" onClick={handleCopySnippet}>
+                Copy snippet
+              </Button>
+              {copyMessage && (
+                <p className={styles["copy-success"]} role="status">
+                  {copyMessage}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardHeader title="Validation messages" />
+          <CardContent>
+            <p className={styles["message-fieldset-note"]}>
+              Default copy for every form using this project key. Override
+              individual fields in markup with{" "}
+              <code>data-a11y-message-required</code>,{" "}
+              <code>data-a11y-message-email</code>, and similar attributes.
+            </p>
+            <div className={styles["message-fields"]}>
+              {VALIDATION_MESSAGE_KEYS.map((key) => (
+                <FormField
+                  key={key}
+                  id={`message-${key}`}
+                  label={VALIDATION_MESSAGE_LABELS[key]}
+                >
+                  <input
+                    name={`message-${key}`}
+                    value={messages[key]}
+                    onChange={(event) =>
+                      setMessages((current) => ({
+                        ...current,
+                        [key]: event.target.value,
+                      }))
+                    }
+                    placeholder={DEFAULT_VALIDATION_MESSAGES[key]}
+                  />
+                </FormField>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className={styles["form-actions-row"]}>
+          <Button type="submit" isLoading={isSaving}>
+            Save changes
+          </Button>
+          {!confirmDelete ? (
+            <Button
+              type="button"
+              variant="danger"
+              onClick={() => setConfirmDelete(true)}
+            >
+              Delete project
+            </Button>
+          ) : (
+            <>
+              <Button
+                type="button"
+                variant="danger"
+                isLoading={isDeleting}
+                onClick={handleDelete}
+              >
+                Confirm delete
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setConfirmDelete(false)}
+              >
+                Cancel
+              </Button>
+            </>
+          )}
+        </div>
+      </form>
+    </>
+  );
+}

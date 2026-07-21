@@ -187,6 +187,55 @@ function attachForm(form, config) {
   });
 }
 
+export async function saveScanReport(projectKey, report, options = {}) {
+  const script =
+    options.script ||
+    document.currentScript ||
+    document.querySelector("script[data-a11y-project]");
+  let url = options.scansUrl;
+  if (!url) {
+    if (script?.src) {
+      url = new URL("/api/public/scans", script.src).href;
+    } else {
+      url = "/api/public/scans";
+    }
+  }
+
+  const fieldCount = options.fieldCount ?? 0;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      public_key: projectKey,
+      form_identifier: options.formIdentifier ?? undefined,
+      error_count: report.errorCount,
+      warning_count: report.warningCount,
+      passed_count: Math.max(
+        0,
+        fieldCount - report.errorCount - report.warningCount,
+      ),
+      results: report.issues,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Could not save scan (${response.status})`);
+  }
+
+  return response.json();
+}
+
+function shouldSaveScans(options, script) {
+  return (
+    options.saveScans === true ||
+    script?.dataset?.a11ySaveScans === "true" ||
+    script?.hasAttribute("data-a11y-save-scans")
+  );
+}
+
 export function createValidator(options = {}) {
   const config = {
     ...defaults,
@@ -256,7 +305,7 @@ export async function autoInit(options = {}) {
     try {
       remote = await fetchProjectConfig(projectKey, configUrl);
     } catch (error) {
-      console.warn("[A11yFormValidator] Could not load project config:", error);
+      console.warn("[Keystone] Could not load project config:", error);
     }
   }
 
@@ -266,7 +315,23 @@ export async function autoInit(options = {}) {
     if (options.scanOnInit !== false) {
       const report = validator.scan();
       if (report.errorCount || report.warningCount) {
-        console.info("[A11yFormValidator] Scan report", report);
+        console.info("[Keystone] Scan report", report);
+      }
+
+      if (shouldSaveScans(options, script) && projectKey) {
+        const forms = validator.listForms();
+        const fieldCount = forms.reduce(
+          (total, form) => total + form.fieldCount,
+          0,
+        );
+        saveScanReport(projectKey, report, {
+          script,
+          fieldCount,
+          formIdentifier: forms[0]?.identifier,
+          scansUrl: options.scansUrl,
+        }).catch((error) => {
+          console.warn("[Keystone] Could not save scan:", error);
+        });
       }
     }
   };
@@ -286,12 +351,13 @@ const api = {
   createValidator,
   autoInit,
   fetchProjectConfig,
+  saveScanReport,
   scanDocument,
   summarizeScan,
 };
 
 if (typeof window !== "undefined") {
-  window.A11yFormValidator = api;
+  window.Keystone = api;
 }
 
 export default api;

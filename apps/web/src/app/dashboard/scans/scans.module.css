@@ -29,6 +29,71 @@
   font-weight: 750;
 }
 
+.header-action {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--brand-900);
+  color: var(--brand-100);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.empty-state {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.empty-state a {
+  color: var(--brand-600);
+  font-weight: 750;
+}
+
+.scan-timestamp {
+  margin: 0 0 var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.history-card {
+  margin-top: var(--space-6);
+}
+
+.history-list {
+  display: grid;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.history-item:last-child {
+  border-bottom: 0;
+}
+
+.history-item span {
+  display: grid;
+}
+
+.history-item small {
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.history-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
 @media (max-width: 850px) {
   .scan-grid {
     grid-template-columns: 1fr;

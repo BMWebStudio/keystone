@@ -5,7 +5,11 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "exports": {
-    ".": "./dist/index.js",
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
     "./a11y-validator.js": "./dist/a11y-validator.js"
   },
   "files": [

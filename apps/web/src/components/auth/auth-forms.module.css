@@ -1,0 +1,29 @@
+.form-message-error,
+.form-message-success {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+}
+
+.form-message-error {
+  background: var(--danger-50, #fef2f2);
+  color: var(--danger-700, #b91c1c);
+  border: 1px solid var(--danger-200, #fecaca);
+}
+
+.form-message-success {
+  background: var(--success-50, #f0fdf4);
+  color: var(--success-700, #15803d);
+  border: 1px solid var(--success-200, #bbf7d0);
+}
+
+.form-footer {
+  margin: var(--space-4) 0 0;
+  color: var(--text-muted);
+}
+
+.form-footer a {
+  color: var(--brand-700);
+  font-weight: 700;
+}

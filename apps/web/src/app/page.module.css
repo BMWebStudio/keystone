@@ -16,6 +16,11 @@
   border-bottom: 1px solid var(--border-default);
 }
 
+.nav-links {
+  display: flex;
+  gap: var(--space-4);
+}
+
 .landing-page nav a {
   font-weight: 750;
 }
@@ -36,8 +41,8 @@
 .hero h1 {
   margin: var(--space-4) 0;
   font-size: var(--heading-lg);
-  line-height: 0.98;
-  letter-spacing: -0.055em;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
 }
 
 .hero h1 em {

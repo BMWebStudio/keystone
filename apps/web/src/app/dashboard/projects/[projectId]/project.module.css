@@ -1,14 +1,20 @@
-.project-grid {
+.project-layout {
   display: grid;
-  grid-template-columns: 0.75fr 1.25fr;
   gap: var(--space-6);
 }
 
-.project-grid dl {
-  margin: 0;
+.project-grid-top {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: var(--space-6);
+  align-items: start;
 }
 
-.project-grid dl div {
+.project-grid-top dl {
+  margin: 0 0 var(--space-4);
+}
+
+.project-grid-top dl div {
   display: flex;
   justify-content: space-between;
   gap: var(--space-4);
@@ -16,20 +22,20 @@
   border-bottom: 1px solid var(--border-default);
 }
 
-.project-grid dt {
+.project-grid-top dt {
   color: var(--text-muted);
 }
 
-.project-grid dd {
+.project-grid-top dd {
   margin: 0;
   font-weight: 750;
 }
 
-.project-grid p {
+.project-grid-top p {
   color: var(--text-secondary);
 }
 
-.project-grid pre {
+.project-grid-top pre {
   overflow: auto;
   padding: var(--space-4);
   background: var(--brand-900);
@@ -37,8 +43,8 @@
   border-radius: var(--radius-sm);
 }
 
-@media (max-width: 850px) {
-  .project-grid {
+@media (max-width: 900px) {
+  .project-grid-top {
     grid-template-columns: 1fr;
   }
 }

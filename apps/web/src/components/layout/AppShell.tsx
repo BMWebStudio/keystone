@@ -17,7 +17,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <Link className={styles["brand-link"]} href="/dashboard">
           <span className={styles["brand-mark"]}>BM</span>
           <span>
-            A11y Validator<small>by BM Web Studio</small>
+            Keystone<small>by BM Web Studio</small>
           </span>
         </Link>
         <nav aria-label="Primary">
