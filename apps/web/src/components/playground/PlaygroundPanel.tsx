@@ -71,6 +71,7 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
   const [validationModeLabel, setValidationModeLabel] = useState(
     "Blur + submit (Recommended)",
   );
+  const [configNotice, setConfigNotice] = useState<string | null>(null);
   const [scanPayload, setScanPayload] = useState<ScanPayload | null>(null);
   const [scanIssues, setScanIssues] = useState<ScanIssue[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
@@ -87,6 +88,7 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
       if (!root) return;
 
       resetPlaygroundForm(root);
+      setConfigNotice(null);
 
       const project = projects.find((item) => item.id === selectedProjectId);
       let remote = {};
@@ -95,7 +97,9 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
         try {
           remote = await fetchProjectConfig(project.public_key);
         } catch {
-          // Use built-in defaults when config cannot be loaded.
+          setConfigNotice(
+            "Could not load this project's saved settings. Using built-in defaults until the project is active and reachable.",
+          );
         }
       }
 
@@ -250,6 +254,11 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
           {projects.length > 0 && (
             <p className={styles["inline-note"]}>
               Active validation mode: <strong>{validationModeLabel}</strong>
+            </p>
+          )}
+          {configNotice && (
+            <p className={styles["form-error"]} role="status">
+              {configNotice}
             </p>
           )}
           {!projects.length && (

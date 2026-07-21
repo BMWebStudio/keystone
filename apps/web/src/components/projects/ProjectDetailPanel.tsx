@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { FormField } from "@/components/forms/FormField";
 import formFieldStyles from "@/components/forms/FormField.module.css";
 import { Button } from "@/components/ui/Button";
@@ -128,6 +128,21 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const nextSettings = getSettings(project.project_settings);
+    setName(project.name);
+    setDomain(project.domain ?? "");
+    setValidationMode(normalizeValidationMode(nextSettings.validation_mode));
+    setShowErrorSummary(
+      nextSettings.show_error_summary ? "enabled" : "disabled",
+    );
+    setDisableNativeValidation(
+      nextSettings.disable_native_validation ? "disabled" : "enabled",
+    );
+    setMessages(mergeValidationMessages(nextSettings.messages));
+    setErrorColors(mergeErrorFieldColors(nextSettings.error_colors));
+  }, [project]);
 
   async function handleSave(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

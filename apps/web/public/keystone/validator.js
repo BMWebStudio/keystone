@@ -230,7 +230,7 @@ function inferFieldKind(field) {
 
 /**
  * Resolve the message for a failed rule.
- * Priority: data-keystone-message-* → data-a11y-message-* → field kind default → generic rule default.
+ * Priority: field attrs → project kind overrides → project rule copy → built-in kind defaults → built-in generic defaults.
  */
 function resolveFieldMessage(field, rule, config, genericMessages) {
   const ruleKey = `${rule[0].toUpperCase()}${rule.slice(1)}`;
@@ -239,12 +239,19 @@ function resolveFieldMessage(field, rule, config, genericMessages) {
 
   const kind = inferFieldKind(field);
   if (kind) {
-    const fieldMessages =
-      config.fieldMessages?.[kind] || defaultFieldMessages[kind];
+    const projectKindMessage = config.fieldMessages?.[kind]?.[rule];
+    if (projectKindMessage) return projectKindMessage;
+  }
+
+  const projectRuleMessage = config.messages?.[rule];
+  if (projectRuleMessage) return projectRuleMessage;
+
+  if (kind) {
+    const fieldMessages = defaultFieldMessages[kind];
     if (fieldMessages?.[rule]) return fieldMessages[rule];
   }
 
-  return config.messages?.[rule] || genericMessages[rule];
+  return genericMessages[rule];
 }
 
 const STYLE_ID = "keystone-validator-styles";
@@ -553,7 +560,7 @@ const defaults = {
 
 function buildFieldMessageOverrides(messages = {}) {
   const overrides = {};
-  for (const kind of ["name", "phone", "url"]) {
+  for (const kind of ["name", "phone", "url", "email"]) {
     const copy = messages[kind];
     if (!copy || !defaultFieldMessages[kind]) continue;
     overrides[kind] = Object.fromEntries(
@@ -561,6 +568,19 @@ function buildFieldMessageOverrides(messages = {}) {
     );
   }
   return overrides;
+}
+
+function hasRemoteConfigShape(options) {
+  return (
+    "validation_mode" in options ||
+    "show_error_summary" in options ||
+    "disable_native_validation" in options ||
+    "error_colors" in options
+  );
+}
+
+function resolveValidatorOptions(options = {}) {
+  return hasRemoteConfigShape(options) ? mapRemoteConfig(options) : options;
 }
 
 function fields(form) {
@@ -834,21 +854,34 @@ function shouldSaveScans(options, script) {
 }
 
 function createValidator(options = {}) {
+  const resolved = resolveValidatorOptions(options);
   const config = {
     ...defaults,
-    ...options,
+    ...resolved,
     validationMode: normalizeMode(
-      options.validationMode ??
-        options.validation_mode ??
+      resolved.validationMode ??
+        resolved.validation_mode ??
         defaults.validationMode,
     ),
-    messages: { ...defaults.messages, ...options.messages },
+    showErrorSummary:
+      resolved.showErrorSummary ??
+      resolved.show_error_summary ??
+      defaults.showErrorSummary,
+    focusErrorSummary:
+      resolved.focusErrorSummary ??
+      resolved.focus_error_summary ??
+      defaults.focusErrorSummary,
+    disableNativeValidation:
+      resolved.disableNativeValidation ??
+      resolved.disable_native_validation ??
+      defaults.disableNativeValidation,
+    messages: { ...defaults.messages, ...resolved.messages },
     fieldMessages: {
       ...defaultFieldMessages,
-      ...buildFieldMessageOverrides(options.messages),
-      ...options.fieldMessages,
+      ...buildFieldMessageOverrides(resolved.messages),
+      ...resolved.fieldMessages,
     },
-    errorColors: options.errorColors ?? {},
+    errorColors: resolved.errorColors ?? resolved.error_colors ?? {},
   };
 
   return {

@@ -167,7 +167,7 @@ import { readDataset } from "./attrs.js";
 
 /**
  * Resolve the message for a failed rule.
- * Priority: data-keystone-message-* → data-a11y-message-* → field kind default → generic rule default.
+ * Priority: field attrs → project kind overrides → project rule copy → built-in kind defaults → built-in generic defaults.
  */
 export function resolveFieldMessage(field, rule, config, genericMessages) {
   const ruleKey = `${rule[0].toUpperCase()}${rule.slice(1)}`;
@@ -176,10 +176,17 @@ export function resolveFieldMessage(field, rule, config, genericMessages) {
 
   const kind = inferFieldKind(field);
   if (kind) {
-    const fieldMessages =
-      config.fieldMessages?.[kind] || defaultFieldMessages[kind];
+    const projectKindMessage = config.fieldMessages?.[kind]?.[rule];
+    if (projectKindMessage) return projectKindMessage;
+  }
+
+  const projectRuleMessage = config.messages?.[rule];
+  if (projectRuleMessage) return projectRuleMessage;
+
+  if (kind) {
+    const fieldMessages = defaultFieldMessages[kind];
     if (fieldMessages?.[rule]) return fieldMessages[rule];
   }
 
-  return config.messages?.[rule] || genericMessages[rule];
+  return genericMessages[rule];
 }

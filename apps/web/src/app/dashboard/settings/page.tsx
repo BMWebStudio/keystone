@@ -91,7 +91,8 @@ export default async function SettingsPage() {
                 Save defaults
               </Button>
               <p className={styles["settings-note"]}>
-                Default project settings will be saved here in a later update.
+                These defaults apply only when you create a new project. Saved
+                project settings always override them at runtime.
               </p>
             </form>
           </CardContent>

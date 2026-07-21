@@ -63,11 +63,24 @@ describe("resolveFieldMessage", () => {
     );
   });
 
-  it("uses field-kind defaults for common names", () => {
+  it("uses project generic messages before built-in field-kind defaults", () => {
     const field = mockField({ name: "email", type: "email" });
     assert.equal(
       resolveFieldMessage(field, "required", { messages: generic }, generic),
-      defaultFieldMessages.email.required,
+      generic.required,
+    );
+  });
+
+  it("uses project email messages for email fields", () => {
+    const field = mockField({ name: "email", type: "email" });
+    assert.equal(
+      resolveFieldMessage(
+        field,
+        "email",
+        { messages: { email: "Use a valid work email." } },
+        generic,
+      ),
+      "Use a valid work email.",
     );
   });
 

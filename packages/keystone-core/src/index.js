@@ -30,7 +30,7 @@ const defaults = {
 
 function buildFieldMessageOverrides(messages = {}) {
   const overrides = {};
-  for (const kind of ["name", "phone", "url"]) {
+  for (const kind of ["name", "phone", "url", "email"]) {
     const copy = messages[kind];
     if (!copy || !defaultFieldMessages[kind]) continue;
     overrides[kind] = Object.fromEntries(
@@ -38,6 +38,19 @@ function buildFieldMessageOverrides(messages = {}) {
     );
   }
   return overrides;
+}
+
+function hasRemoteConfigShape(options) {
+  return (
+    "validation_mode" in options ||
+    "show_error_summary" in options ||
+    "disable_native_validation" in options ||
+    "error_colors" in options
+  );
+}
+
+function resolveValidatorOptions(options = {}) {
+  return hasRemoteConfigShape(options) ? mapRemoteConfig(options) : options;
 }
 
 function fields(form) {
@@ -311,21 +324,34 @@ function shouldSaveScans(options, script) {
 }
 
 export function createValidator(options = {}) {
+  const resolved = resolveValidatorOptions(options);
   const config = {
     ...defaults,
-    ...options,
+    ...resolved,
     validationMode: normalizeMode(
-      options.validationMode ??
-        options.validation_mode ??
+      resolved.validationMode ??
+        resolved.validation_mode ??
         defaults.validationMode,
     ),
-    messages: { ...defaults.messages, ...options.messages },
+    showErrorSummary:
+      resolved.showErrorSummary ??
+      resolved.show_error_summary ??
+      defaults.showErrorSummary,
+    focusErrorSummary:
+      resolved.focusErrorSummary ??
+      resolved.focus_error_summary ??
+      defaults.focusErrorSummary,
+    disableNativeValidation:
+      resolved.disableNativeValidation ??
+      resolved.disable_native_validation ??
+      defaults.disableNativeValidation,
+    messages: { ...defaults.messages, ...resolved.messages },
     fieldMessages: {
       ...defaultFieldMessages,
-      ...buildFieldMessageOverrides(options.messages),
-      ...options.fieldMessages,
+      ...buildFieldMessageOverrides(resolved.messages),
+      ...resolved.fieldMessages,
     },
-    errorColors: options.errorColors ?? {},
+    errorColors: resolved.errorColors ?? resolved.error_colors ?? {},
   };
 
   return {
