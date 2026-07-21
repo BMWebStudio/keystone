@@ -1,0 +1,16 @@
+{
+  "name": "@keystone/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./validator.js": "./dist/validator.js"
+  },
+  "scripts": {
+    "build": "node ./scripts/build.mjs",
+    "test": "node --test test/*.test.js"
+  }
+}

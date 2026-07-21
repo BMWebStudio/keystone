@@ -163,13 +163,16 @@ export function inferFieldKind(field) {
   return null;
 }
 
+import { readDataset } from "./attrs.js";
+
 /**
  * Resolve the message for a failed rule.
- * Priority: data-a11y-message-* → field kind default → generic rule default.
+ * Priority: data-keystone-message-* → data-a11y-message-* → field kind default → generic rule default.
  */
 export function resolveFieldMessage(field, rule, config, genericMessages) {
-  const dataKey = `a11yMessage${rule[0].toUpperCase()}${rule.slice(1)}`;
-  if (field.dataset?.[dataKey]) return field.dataset[dataKey];
+  const ruleKey = `${rule[0].toUpperCase()}${rule.slice(1)}`;
+  const keystoneMessage = readDataset(field, `keystoneMessage${ruleKey}`, `a11yMessage${ruleKey}`);
+  if (keystoneMessage) return keystoneMessage;
 
   const kind = inferFieldKind(field);
   if (kind) {

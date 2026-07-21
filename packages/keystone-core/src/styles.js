@@ -1,4 +1,4 @@
-const STYLE_ID = "a11y-validator-styles";
+const STYLE_ID = "keystone-validator-styles";
 
 /** WCAG AA (4.5:1+) error palette for injected validator styles. */
 export const errorStyleTokens = {
@@ -45,6 +45,9 @@ export function injectDefaultStyles(overrides = {}) {
   const style = document.createElement("style");
   style.id = STYLE_ID;
   style.textContent = `
+input.keystone-field-invalid,
+select.keystone-field-invalid,
+textarea.keystone-field-invalid,
 input.a11y-field-invalid,
 select.a11y-field-invalid,
 textarea.a11y-field-invalid,
@@ -57,6 +60,9 @@ textarea[aria-invalid="true"] {
   box-shadow: 0 0 0 1px ${t.border};
 }
 
+input.keystone-field-invalid:focus-visible,
+select.keystone-field-invalid:focus-visible,
+textarea.keystone-field-invalid:focus-visible,
 input.a11y-field-invalid:focus-visible,
 select.a11y-field-invalid:focus-visible,
 textarea.a11y-field-invalid:focus-visible,
@@ -70,6 +76,7 @@ textarea[aria-invalid="true"]:focus-visible {
   outline-offset: 2px;
 }
 
+.keystone-field-error,
 .a11y-field-error {
   margin: 0.25rem 0 0;
   color: ${t.text};
@@ -78,6 +85,7 @@ textarea[aria-invalid="true"]:focus-visible {
   line-height: 1.45;
 }
 
+.keystone-error-summary,
 .a11y-error-summary {
   margin-bottom: 1rem;
   padding: 1rem;
@@ -87,17 +95,20 @@ textarea[aria-invalid="true"]:focus-visible {
   color: ${t.text};
 }
 
+.keystone-error-summary h2,
 .a11y-error-summary h2 {
   margin: 0 0 0.5rem;
   font-size: 1rem;
   color: ${t.text};
 }
 
+.keystone-error-summary a,
 .a11y-error-summary a {
   color: ${t.text};
   font-weight: 700;
 }
 
+.keystone-error-summary a:focus-visible,
 .a11y-error-summary a:focus-visible {
   outline: 3px solid ${t.borderFocus};
   outline-offset: 2px;

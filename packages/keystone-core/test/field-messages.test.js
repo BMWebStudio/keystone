@@ -51,11 +51,11 @@ describe("resolveFieldMessage", () => {
     email: "Enter an email address in the format name@example.com.",
   };
 
-  it("prefers data-a11y-message attributes", () => {
+  it("prefers data-keystone-message attributes", () => {
     const field = mockField({
       type: "email",
       name: "email",
-      dataset: { a11yMessageRequired: "Custom required message." },
+      dataset: { keystoneMessageRequired: "Custom required message." },
     });
     assert.equal(
       resolveFieldMessage(field, "required", { messages: generic }, generic),

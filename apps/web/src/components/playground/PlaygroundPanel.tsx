@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { createValidator } from "@a11y/validator-core";
+import { createValidator } from "@keystone/core";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -249,7 +249,7 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
                 onSubmit={submit}
                 noValidate
                 className={styles["playground-form"]}
-                data-a11y-form-id="playground-contact"
+                data-keystone-form-id="playground-contact"
               >
                 <FormField
                   id="name"
@@ -296,7 +296,7 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
             {!scanIssues.length ? (
               <p className={styles["inline-note"]}>
                 Run a markup scan to inspect labels, grouping, duplicate ids,
-                and other accessibility patterns from validator-core.
+                and other accessibility patterns from keystone-core.
               </p>
             ) : (
               scanIssues.map((issue) => (

@@ -22,25 +22,25 @@ cd apps/web && npm run build
 # Lint
 cd apps/web && npm run lint
 
-# validator-core (no bundler yet — build just copies src to dist)
-cd packages/validator-core && npm run build
+# keystone-core (no bundler yet — build just copies src to dist)
+cd packages/keystone-core && npm run build
 
-# validator-core tests (Node built-in test runner)
-cd packages/validator-core && npm test
+# keystone-core tests (Node built-in test runner)
+cd packages/keystone-core && npm test
 ```
 
 ## Architecture
 
 Two independent layers that share no runtime code:
 
-### `packages/validator-core`
+### `packages/keystone-core`
 
 Framework-independent browser JavaScript. No React, no Next.js, no Supabase dependencies.
 
-- `src/index.js` — `createValidator(options?)` factory. Discovers `form:not([data-a11y-ignore-form])` by default. Injects inline errors and an error summary. Manages `aria-invalid` / `aria-describedby` without clobbering existing refs. Also exposes `autoInit()`, `listForms()`, and remote config loading via `data-a11y-project`.
+- `src/index.js` — `createValidator(options?)` factory. Discovers forms unless opted out with `data-keystone-ignore-form`. Injects inline errors and an error summary. Manages `aria-invalid` / `aria-describedby` without clobbering existing refs. Also exposes `autoInit()`, `listForms()`, and remote config loading via `data-keystone-project`.
 - `src/rules.js` — `inferRules(field)` from native HTML attributes.
 - `src/scan.js` — markup scan for missing labels, ungrouped options, duplicate ids, missing submit controls.
-- Build produces ESM in `dist/` plus drop-in `dist/a11y-validator.js` (IIFE). Synced to `apps/web/public/validator/` on web predev/prebuild.
+- Build produces ESM in `dist/` plus drop-in `dist/validator.js` (IIFE). Synced to `apps/web/public/keystone/` on web predev/prebuild.
 
 ### `apps/web`
 
@@ -81,5 +81,5 @@ Apply the migration to your Supabase project before running.
 - Login page exists (`/login`) but Supabase Auth calls are not implemented.
 - Dashboard data is static demo data — no authenticated Supabase queries yet.
 - No Server Actions — CRUD for projects/settings is planned with Zod.
-- `validator-core` has no tsup build, no Vitest/axe-core tests.
+- `keystone-core` has no tsup build, no Vitest/axe-core tests.
 - No Playwright or React Testing Library setup.

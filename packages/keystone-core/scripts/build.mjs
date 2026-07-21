@@ -19,6 +19,7 @@ function stripExports(source) {
     .replace(/export\s+default\s+api;?\n?/g, "");
 }
 
+const attrs = stripExports(readFileSync(join(src, "attrs.js"), "utf8"));
 const rules = stripExports(readFileSync(join(src, "rules.js"), "utf8"));
 const fieldMessages = stripExports(
   readFileSync(join(src, "field-messages.js"), "utf8"),
@@ -31,6 +32,7 @@ const index = stripExports(readFileSync(join(src, "index.js"), "utf8"))
 
 const bundle = `/*! Keystone — universal browser build */
 (function (global) {
+${attrs}
 ${rules}
 ${fieldMessages}
 ${styles}
@@ -46,11 +48,11 @@ ${index}
   };
   global.Keystone = api;
   const script = document.currentScript;
-  if (script && (script.dataset.a11yProject || script.hasAttribute("data-a11y-auto"))) {
+  if (script && (readScriptValue(script, "project") || hasScriptFlag(script, "auto"))) {
     autoInit();
   }
 })(typeof window !== "undefined" ? window : globalThis);
 `;
 
-writeFileSync(join(dist, "a11y-validator.js"), bundle);
-console.log("Built dist/ (ESM + a11y-validator.js)");
+writeFileSync(join(dist, "validator.js"), bundle);
+console.log("Built dist/ (ESM + validator.js)");

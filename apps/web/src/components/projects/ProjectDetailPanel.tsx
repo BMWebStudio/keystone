@@ -96,8 +96,8 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
     process.env.NEXT_PUBLIC_APP_URL ||
     "https://keystone-web-tmld.vercel.app";
   const snippet = `<script
-  src="${appUrl}/validator/a11y-validator.js"
-  data-a11y-project="${project.public_key}"
+  src="${appUrl}/keystone/validator.js"
+  data-keystone-project="${project.public_key}"
   defer
 ></script>`;
 
@@ -313,13 +313,15 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
             <p className={styles["message-fieldset-note"]}>
               Default copy for every form using this project key. Override
               individual fields in markup with{" "}
-              <code>data-a11y-message-required</code>,{" "}
-              <code>data-a11y-message-email</code>, and similar attributes.
+              <code>data-keystone-message-required</code>,{" "}
+              <code>data-keystone-message-email</code>, and similar attributes.
+              Legacy <code>data-a11y-message-*</code> attributes are still
+              supported.
             </p>
             <p className={styles["message-fieldset-note"]}>
               For custom formats, add a <code>pattern</code> attribute on the
               field and set{" "}
-              <code>data-a11y-message-pattern=&quot;Your message here&quot;</code>{" "}
+              <code>data-keystone-message-pattern=&quot;Your message here&quot;</code>{" "}
               on that same input. Pattern messages are field-specific, so you do
               not need a project setting for them. If no field message is set,
               the validator uses the built-in fallback: &quot;

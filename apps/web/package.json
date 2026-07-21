@@ -1,10 +1,10 @@
 {
-  "name": "@a11y/web",
+  "name": "@keystone/web",
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "predev": "npm run build --workspace=@a11y/validator-core && node ./scripts/sync-validator.mjs",
-    "prebuild": "npm run build --workspace=@a11y/validator-core && node ./scripts/sync-validator.mjs",
+    "predev": "npm run build --workspace=@keystone/core && node ./scripts/sync-validator.mjs",
+    "prebuild": "npm run build --workspace=@keystone/core && node ./scripts/sync-validator.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -12,7 +12,7 @@
     "sync:validator": "node ./scripts/sync-validator.mjs"
   },
   "dependencies": {
-    "@a11y/validator-core": "*",
+    "@keystone/core": "*",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.1",
     "next": "^15.2.3",

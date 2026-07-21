@@ -1,3 +1,5 @@
+import { hasFlag } from "./attrs.js";
+
 /**
  * Accessibility scan rules for broken / incomplete form markup.
  * These are guidance checks, not WCAG certification.
@@ -41,7 +43,7 @@ function controls(form) {
   ].filter(
     (el) =>
       !el.disabled &&
-      !el.hasAttribute("data-a11y-ignore") &&
+      !hasFlag(el, "data-keystone-ignore", "data-a11y-ignore") &&
       el.type !== "submit" &&
       el.type !== "button" &&
       el.type !== "reset" &&
@@ -56,7 +58,8 @@ function controls(form) {
 export function scanDocument(root = document) {
   const issues = [];
   const forms = [...root.querySelectorAll("form")].filter(
-    (form) => !form.hasAttribute("data-a11y-ignore-form"),
+    (form) =>
+      !hasFlag(form, "data-keystone-ignore-form", "data-a11y-ignore-form"),
   );
 
   if (forms.length === 0) {

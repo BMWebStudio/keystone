@@ -1,3 +1,4 @@
+import { hasFlag, readDataset, readScriptValue, hasScriptFlag } from "./attrs.js";
 import { inferRules, rules } from "./rules.js";
 import { scanDocument, summarizeScan } from "./scan.js";
 import {
@@ -8,8 +9,9 @@ import {
 import { injectDefaultStyles } from "./styles.js";
 
 const defaults = {
-  /** Track every form unless it opts out with data-a11y-ignore-form */
-  selector: "form:not([data-a11y-ignore-form])",
+  /** Track every form unless it opts out with data-keystone-ignore-form */
+  selector:
+    "form:not([data-keystone-ignore-form]):not([data-a11y-ignore-form])",
   validationMode: ["submit", "blur"],
   showErrorSummary: true,
   focusErrorSummary: true,
@@ -41,7 +43,11 @@ function buildFieldMessageOverrides(messages = {}) {
 function fields(form) {
   return [
     ...form.querySelectorAll("input:not([type='hidden']),select,textarea"),
-  ].filter((f) => !f.disabled && !f.hasAttribute("data-a11y-ignore"));
+  ].filter(
+    (f) =>
+      !f.disabled &&
+      !hasFlag(f, "data-keystone-ignore", "data-a11y-ignore"),
+  );
 }
 
 function message(field, rule, config) {
@@ -52,7 +58,7 @@ function clear(field) {
   const id = `${field.id}-error`;
   document.getElementById(id)?.remove();
   field.removeAttribute("aria-invalid");
-  field.classList.remove("a11y-field-invalid");
+  field.classList.remove("keystone-field-invalid", "a11y-field-invalid");
   const refs = (field.getAttribute("aria-describedby") || "")
     .split(/\s+/)
     .filter(Boolean)
@@ -64,15 +70,15 @@ function clear(field) {
 function show(field, text) {
   clear(field);
   if (!field.id) {
-    field.id = `a11y-field-${globalThis.crypto?.randomUUID?.() || Math.random().toString(36).slice(2)}`;
+    field.id = `keystone-field-${globalThis.crypto?.randomUUID?.() || Math.random().toString(36).slice(2)}`;
   }
   const el = document.createElement("p");
   el.id = `${field.id}-error`;
-  el.className = "a11y-field-error";
+  el.className = "keystone-field-error";
   el.textContent = text;
   field.insertAdjacentElement("afterend", el);
   field.setAttribute("aria-invalid", "true");
-  field.classList.add("a11y-field-invalid");
+  field.classList.add("keystone-field-invalid");
   const refs = new Set(
     (field.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean),
   );
@@ -93,13 +99,15 @@ function validateField(field, config) {
 }
 
 function summary(form, errors, config) {
-  form.querySelector("[data-a11y-error-summary]")?.remove();
+  form
+    .querySelector("[data-keystone-error-summary], [data-a11y-error-summary]")
+    ?.remove();
   if (!errors.length || !config.showErrorSummary) return;
   const wrap = document.createElement("div");
-  wrap.dataset.a11yErrorSummary = "";
+  wrap.dataset.keystoneErrorSummary = "";
   wrap.tabIndex = -1;
   wrap.setAttribute("role", "alert");
-  wrap.className = "a11y-error-summary";
+  wrap.className = "keystone-error-summary";
   const heading = document.createElement("h2");
   heading.textContent = `There ${errors.length === 1 ? "is" : "are"} ${errors.length} ${errors.length === 1 ? "error" : "errors"} in this form`;
   const list = document.createElement("ul");
@@ -171,8 +179,8 @@ export async function fetchProjectConfig(projectKey, configUrl) {
 }
 
 function attachForm(form, config) {
-  if (form.dataset.a11yBound === "true") return;
-  form.dataset.a11yBound = "true";
+  if (readDataset(form, "keystoneBound", "a11yBound") === "true") return;
+  form.dataset.keystoneBound = "true";
 
   if (config.disableNativeValidation !== false) form.noValidate = true;
 
@@ -215,7 +223,9 @@ export async function saveScanReport(projectKey, report, options = {}) {
   const script =
     options.script ||
     document.currentScript ||
-    document.querySelector("script[data-a11y-project]");
+    document.querySelector(
+      "script[data-keystone-project], script[data-a11y-project]",
+    );
   let url = options.scansUrl;
   if (!url) {
     if (script?.src) {
@@ -255,8 +265,8 @@ export async function saveScanReport(projectKey, report, options = {}) {
 function shouldSaveScans(options, script) {
   return (
     options.saveScans === true ||
-    script?.dataset?.a11ySaveScans === "true" ||
-    script?.hasAttribute("data-a11y-save-scans")
+    readScriptValue(script, "saveScans") === "true" ||
+    hasScriptFlag(script, "save-scans")
   );
 }
 
@@ -297,7 +307,7 @@ export function createValidator(options = {}) {
         method: (form.getAttribute("method") || "get").toLowerCase(),
         fieldCount: fields(form).length,
         identifier:
-          form.dataset.a11yFormId ||
+          readDataset(form, "keystoneFormId", "a11yFormId") ||
           form.id ||
           form.getAttribute("name") ||
           `form-${index + 1}`,
@@ -320,16 +330,19 @@ export function createValidator(options = {}) {
 
 /**
  * Drop-in bootstrap for:
- * <script src="https://keystone-web-tmld.vercel.app/validator/a11y-validator.js" data-a11y-project="proj_xxx" defer></script>
+ * <script src="https://keystone-web-tmld.vercel.app/keystone/validator.js" data-keystone-project="proj_xxx" defer></script>
  */
 export async function autoInit(options = {}) {
   const script =
     options.script ||
     document.currentScript ||
-    document.querySelector("script[data-a11y-project]");
+    document.querySelector(
+      "script[data-keystone-project], script[data-a11y-project]",
+    );
   const projectKey =
-    options.projectKey || script?.dataset?.a11yProject || null;
-  const configUrl = options.configUrl || script?.dataset?.a11yConfigUrl;
+    options.projectKey || readScriptValue(script, "project") || null;
+  const configUrl =
+    options.configUrl || readScriptValue(script, "configUrl") || null;
 
   let remote = {};
   if (projectKey) {

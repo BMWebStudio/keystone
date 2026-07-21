@@ -4,7 +4,7 @@ Universal accessible form validation for any HTML site—plus a Next.js dashboar
 
 ## Included
 
-- Framework-independent browser validator (`packages/validator-core`)
+- Framework-independent browser validator (`packages/keystone-core`)
 - Drop-in script that discovers forms, validates fields, and scans for broken markup
 - BM Web Studio–inspired dashboard (projects, scans, playground, settings)
 - Supabase schema, RLS, and public project config API
@@ -22,14 +22,14 @@ Apply `supabase/migrations/*.sql`, then set Supabase env vars.
 
 ## Deploy
 
-Production deploys target **Vercel**. Link the repo, set the project root to `apps/web`, and configure Supabase env vars in the Vercel dashboard. The root `npm run build` builds validator-core and the Next.js app.
+Production deploys target **Vercel**. Link the repo, set the project root to `apps/web`, and configure Supabase env vars in the Vercel dashboard. The root `npm run build` builds keystone-core and the Next.js app.
 
 ## Install on any site
 
 ```html
 <script
-  src="https://keystone-web-tmld.vercel.app/validator/a11y-validator.js"
-  data-a11y-project="proj_your_public_key"
+  src="https://keystone-web-tmld.vercel.app/keystone/validator.js"
+  data-keystone-project="proj_your_public_key"
   defer
 ></script>
 ```
@@ -37,9 +37,11 @@ Production deploys target **Vercel**. Link the repo, set the project root to `ap
 The script:
 
 1. Loads remote config from `/api/public/config/:publicKey`
-2. Tracks every `<form>` (opt out with `data-a11y-ignore-form`)
+2. Tracks every `<form>` (opt out with `data-keystone-ignore-form`)
 3. Validates native constraints (`required`, `type="email"`, `minlength`, `pattern`, …)
 4. Scans for missing labels, ungrouped radios/checkboxes, duplicate ids, and missing submit controls
+
+Legacy embed paths and `data-a11y-*` attributes remain supported for backward compatibility.
 
 ## Projects API
 

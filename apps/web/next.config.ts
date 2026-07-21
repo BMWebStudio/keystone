@@ -9,6 +9,15 @@ type CssLoader = {
 
 const nextConfig: NextConfig = {
   experimental: { optimizePackageImports: [] },
+  async redirects() {
+    return [
+      {
+        source: "/validator/a11y-validator.js",
+        destination: "/keystone/validator.js",
+        permanent: true,
+      },
+    ];
+  },
   webpack: (config) => {
     const rules = (config.module?.rules ?? []) as Array<Record<string, unknown>>;
     const oneOfRule = rules.find(

@@ -86,7 +86,7 @@
           id="postal"
           name="postal"
           pattern="[0-9]{5}"
-          data-a11y-message-pattern="Enter a 5-digit postal code."
+          data-keystone-message-pattern="Enter a 5-digit postal code."
           required
         />
       </div>
@@ -101,14 +101,14 @@
 
     <!--
       Production install (Vercel):
-      <script src="https://keystone-web-tmld.vercel.app/validator/a11y-validator.js" data-a11y-project="proj_xxx" defer></script>
+      <script src="https://keystone-web-tmld.vercel.app/keystone/validator.js" data-keystone-project="proj_xxx" defer></script>
     -->
     <script type="module">
       import {
         createValidator,
         scanDocument,
         summarizeScan,
-      } from "../../packages/validator-core/src/index.js";
+      } from "../../packages/keystone-core/src/index.js";
 
       const validator = createValidator().init();
       const report = summarizeScan(scanDocument());
