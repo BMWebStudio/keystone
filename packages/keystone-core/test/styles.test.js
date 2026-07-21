@@ -18,7 +18,6 @@ test("resolveErrorStyleTokens accepts snake_case overrides", () => {
   });
   assert.equal(tokens.surface, "#fff3d8");
   assert.equal(tokens.surfaceFocus, "#efbd5b");
-  assert.equal(tokens.summarySurface, "#fff3d8");
 });
 
 test("resolveErrorStyleTokens ignores invalid hex values", () => {

@@ -13,8 +13,6 @@ const defaults = {
   selector:
     "form:not([data-keystone-ignore-form]):not([data-a11y-ignore-form])",
   validationMode: ["submit", "blur"],
-  showErrorSummary: true,
-  focusErrorSummary: true,
   disableNativeValidation: true,
   messages: {
     required: "This field is required!",
@@ -43,7 +41,6 @@ function buildFieldMessageOverrides(messages = {}) {
 function hasRemoteConfigShape(options) {
   return (
     "validation_mode" in options ||
-    "show_error_summary" in options ||
     "disable_native_validation" in options ||
     "error_colors" in options
   );
@@ -152,34 +149,11 @@ function validateField(field, config) {
   return null;
 }
 
-function summary(form, errors, config) {
-  form
-    .querySelector("[data-keystone-error-summary], [data-a11y-error-summary]")
-    ?.remove();
-  if (!errors.length || !config.showErrorSummary) return;
-  const wrap = document.createElement("div");
-  wrap.dataset.keystoneErrorSummary = "";
-  wrap.tabIndex = -1;
-  wrap.setAttribute("role", "alert");
-  wrap.className = "keystone-error-summary";
-  const heading = document.createElement("h2");
-  heading.textContent = `There ${errors.length === 1 ? "is" : "are"} ${errors.length} ${errors.length === 1 ? "error" : "errors"} in this form`;
-  const list = document.createElement("ul");
-  errors.forEach(({ field, text }) => {
-    const li = document.createElement("li");
-    const a = document.createElement("a");
-    a.href = `#${field.id}`;
-    a.textContent = text;
-    a.addEventListener("click", (event) => {
-      event.preventDefault();
-      field.focus();
-    });
-    li.append(a);
-    list.append(li);
-  });
-  wrap.append(heading, list);
-  form.prepend(wrap);
-  if (config.focusErrorSummary) wrap.focus();
+function focusFirstInvalidField(errors) {
+  const field = errors[0]?.field;
+  if (field instanceof HTMLElement && typeof field.focus === "function") {
+    field.focus();
+  }
 }
 
 function normalizeMode(mode) {
@@ -195,10 +169,6 @@ function mapRemoteConfig(data) {
   if (!data || typeof data !== "object") return {};
   return {
     validationMode: normalizeMode(data.validation_mode ?? data.validationMode),
-    showErrorSummary:
-      data.show_error_summary ?? data.showErrorSummary ?? defaults.showErrorSummary,
-    focusErrorSummary:
-      data.focus_error_summary ?? data.focusErrorSummary ?? defaults.focusErrorSummary,
     disableNativeValidation:
       data.disable_native_validation ??
       data.disableNativeValidation ??
@@ -267,7 +237,7 @@ function attachForm(form, config) {
       .filter((item) => item.text);
     if (errors.length) {
       event.preventDefault();
-      summary(form, errors, config);
+      focusFirstInvalidField(errors);
     }
   });
 }
@@ -333,14 +303,6 @@ export function createValidator(options = {}) {
         resolved.validation_mode ??
         defaults.validationMode,
     ),
-    showErrorSummary:
-      resolved.showErrorSummary ??
-      resolved.show_error_summary ??
-      defaults.showErrorSummary,
-    focusErrorSummary:
-      resolved.focusErrorSummary ??
-      resolved.focus_error_summary ??
-      defaults.focusErrorSummary,
     disableNativeValidation:
       resolved.disableNativeValidation ??
       resolved.disable_native_validation ??
@@ -390,7 +352,7 @@ export function createValidator(options = {}) {
       const errors = fields(form)
         .map((field) => ({ field, text: validateField(field, config) }))
         .filter((item) => item.text);
-      if (errors.length) summary(form, errors, config);
+      if (errors.length) focusFirstInvalidField(errors);
       return errors;
     },
   };

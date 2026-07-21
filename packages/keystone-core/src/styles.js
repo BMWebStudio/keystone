@@ -7,8 +7,6 @@ export const errorStyleTokens = {
   border: "#8a2329",
   borderFocus: "#6b1a22",
   text: "#6b1a22",
-  summarySurface: "#fdebec",
-  summaryBorder: "#8a2329",
 };
 
 function normalizeColor(value) {
@@ -31,7 +29,6 @@ export function resolveErrorStyleTokens(overrides = {}) {
     ...errorStyleTokens,
     surface: fieldBackground,
     surfaceFocus: fieldBackgroundFocus,
-    summarySurface: fieldBackground,
   };
 }
 
@@ -83,35 +80,6 @@ textarea[aria-invalid="true"]:focus-visible {
   font-size: 0.875rem;
   font-weight: 650;
   line-height: 1.45;
-}
-
-.keystone-error-summary,
-.a11y-error-summary {
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: ${t.summarySurface};
-  border-left: 4px solid ${t.summaryBorder};
-  border-radius: 0.25rem;
-  color: ${t.text};
-}
-
-.keystone-error-summary h2,
-.a11y-error-summary h2 {
-  margin: 0 0 0.5rem;
-  font-size: 1rem;
-  color: ${t.text};
-}
-
-.keystone-error-summary a,
-.a11y-error-summary a {
-  color: ${t.text};
-  font-weight: 700;
-}
-
-.keystone-error-summary a:focus-visible,
-.a11y-error-summary a:focus-visible {
-  outline: 3px solid ${t.borderFocus};
-  outline-offset: 2px;
 }
 `.trim();
 

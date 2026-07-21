@@ -4,7 +4,7 @@ Last updated: July 21, 2026
 
 Keystone is a drop-in browser validator. It discovers forms automatically,
 loads project settings from your dashboard, validates native HTML constraints,
-and injects accessible inline errors plus an optional error summary.
+and injects accessible inline errors next to each invalid field.
 
 This guide covers every supported `data-keystone-*` attribute, how settings
 combine, and common questions.
@@ -41,10 +41,8 @@ When a field fails validation, message copy is resolved in this order:
    email, phone, …)
 5. **Built-in generic default** — Keystone fallback copy
 
-Validation mode, error summary, native validation, and error field colors come
-from **saved project settings** in the dashboard. Account defaults on the
-Settings page apply only when creating new projects (not yet persisted).
-Per-project settings always win at runtime.
+Validation mode, native validation, and error field colors come from **saved
+project settings** in the dashboard.
 
 ## Script tag attributes
 
@@ -130,7 +128,6 @@ Configured in the dashboard per project — not via data attributes:
 | Setting | Values | Effect |
 | --- | --- | --- |
 | Validation mode | Submit / Blur + submit | When interactive validation runs. |
-| Error summary | Enabled / Disabled | Focusable error list on blocked submit. |
 | Native validation | Disabled / Enabled | Sets `novalidate` when disabled. |
 
 ## CSS classes and injected markup
@@ -141,8 +138,6 @@ Keystone adds classes and elements you can style on your site:
 | --- | --- |
 | `.keystone-field-invalid` | Invalid inputs (also sets `aria-invalid="true"`) |
 | `.keystone-field-error` | Inline error `<p>` inserted after the field |
-| `.keystone-error-summary` | Error summary container prepended to the form |
-| `[data-keystone-error-summary]` | Same summary element (for test hooks) |
 
 Invalid field background colors can be customized per project in the dashboard
 (WCAG AA contrast checked against the default error text color).

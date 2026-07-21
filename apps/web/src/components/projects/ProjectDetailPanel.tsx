@@ -35,7 +35,6 @@ import {
 
 type ProjectSettings = {
   validation_mode: string;
-  show_error_summary: boolean;
   disable_native_validation: boolean;
   messages?: ValidationMessages | null;
   error_colors?: Partial<ErrorFieldColors> | null;
@@ -60,7 +59,6 @@ function getSettings(
   if (Array.isArray(settings)) {
     return settings[0] ?? {
       validation_mode: "blur",
-      show_error_summary: true,
       disable_native_validation: true,
     };
   }
@@ -68,7 +66,6 @@ function getSettings(
   return (
     settings ?? {
       validation_mode: "blur",
-      show_error_summary: true,
       disable_native_validation: true,
     }
   );
@@ -110,9 +107,6 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
   const [validationMode, setValidationMode] = useState(
     normalizeValidationMode(settings.validation_mode),
   );
-  const [showErrorSummary, setShowErrorSummary] = useState(
-    settings.show_error_summary ? "enabled" : "disabled",
-  );
   const [disableNativeValidation, setDisableNativeValidation] = useState(
     settings.disable_native_validation ? "disabled" : "enabled",
   );
@@ -134,9 +128,6 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
     setName(project.name);
     setDomain(project.domain ?? "");
     setValidationMode(normalizeValidationMode(nextSettings.validation_mode));
-    setShowErrorSummary(
-      nextSettings.show_error_summary ? "enabled" : "disabled",
-    );
     setDisableNativeValidation(
       nextSettings.disable_native_validation ? "disabled" : "enabled",
     );
@@ -170,7 +161,6 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
         name: trimmedName,
         domain: domain.trim() || null,
         validation_mode: validationMode,
-        show_error_summary: showErrorSummary === "enabled",
         disable_native_validation: disableNativeValidation === "disabled",
         messages: serializeProjectSettingsMessages(messages),
         error_colors: serializeErrorFieldColors(errorColors),
@@ -272,16 +262,6 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                   >
                     <option value="submit">Submit only</option>
                     <option value="blur">Blur + submit (Recommended)</option>
-                  </select>
-                </FormField>
-                <FormField id="edit-error-summary" label="Error summary">
-                  <select
-                    name="showErrorSummary"
-                    value={showErrorSummary}
-                    onChange={(event) => setShowErrorSummary(event.target.value)}
-                  >
-                    <option value="enabled">Enabled</option>
-                    <option value="disabled">Disabled</option>
                   </select>
                 </FormField>
                 <FormField

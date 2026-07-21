@@ -19,7 +19,7 @@ export async function GET(_: Request, { params }: RouteContext) {
   const { data, error } = await supabase
     .from("projects")
     .select(
-      "id,name,domain,public_key,is_active,created_at,updated_at,project_settings(validation_mode,show_error_summary,focus_error_summary,disable_native_validation,messages,error_colors)",
+      "id,name,domain,public_key,is_active,created_at,updated_at,project_settings(validation_mode,disable_native_validation,messages,error_colors)",
     )
     .eq("id", projectId)
     .eq("user_id", user.id)
@@ -104,9 +104,6 @@ export async function PUT(request: Request, { params }: RouteContext) {
   if (parsed.data.validation_mode !== undefined) {
     settingsFields.validation_mode = parsed.data.validation_mode;
   }
-  if (parsed.data.show_error_summary !== undefined) {
-    settingsFields.show_error_summary = parsed.data.show_error_summary;
-  }
   if (parsed.data.disable_native_validation !== undefined) {
     settingsFields.disable_native_validation =
       parsed.data.disable_native_validation;
@@ -132,7 +129,7 @@ export async function PUT(request: Request, { params }: RouteContext) {
   const { data, error } = await supabase
     .from("projects")
     .select(
-      "id,name,domain,public_key,is_active,created_at,updated_at,project_settings(validation_mode,show_error_summary,focus_error_summary,disable_native_validation,messages,error_colors)",
+      "id,name,domain,public_key,is_active,created_at,updated_at,project_settings(validation_mode,disable_native_validation,messages,error_colors)",
     )
     .eq("id", projectId)
     .single();

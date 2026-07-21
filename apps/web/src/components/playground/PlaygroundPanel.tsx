@@ -52,9 +52,6 @@ function resetPlaygroundForm(root: HTMLElement) {
   root
     .querySelectorAll(".keystone-field-error, .a11y-field-error")
     .forEach((el) => el.remove());
-  root
-    .querySelector("[data-keystone-error-summary], [data-a11y-error-summary]")
-    ?.remove();
 }
 
 function formatValidationMode(modes: string[]) {

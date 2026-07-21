@@ -263,8 +263,6 @@ const errorStyleTokens = {
   border: "#8a2329",
   borderFocus: "#6b1a22",
   text: "#6b1a22",
-  summarySurface: "#fdebec",
-  summaryBorder: "#8a2329",
 };
 
 function normalizeColor(value) {
@@ -287,7 +285,6 @@ function resolveErrorStyleTokens(overrides = {}) {
     ...errorStyleTokens,
     surface: fieldBackground,
     surfaceFocus: fieldBackgroundFocus,
-    summarySurface: fieldBackground,
   };
 }
 
@@ -339,35 +336,6 @@ textarea[aria-invalid="true"]:focus-visible {
   font-size: 0.875rem;
   font-weight: 650;
   line-height: 1.45;
-}
-
-.keystone-error-summary,
-.a11y-error-summary {
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: ${t.summarySurface};
-  border-left: 4px solid ${t.summaryBorder};
-  border-radius: 0.25rem;
-  color: ${t.text};
-}
-
-.keystone-error-summary h2,
-.a11y-error-summary h2 {
-  margin: 0 0 0.5rem;
-  font-size: 1rem;
-  color: ${t.text};
-}
-
-.keystone-error-summary a,
-.a11y-error-summary a {
-  color: ${t.text};
-  font-weight: 700;
-}
-
-.keystone-error-summary a:focus-visible,
-.a11y-error-summary a:focus-visible {
-  outline: 3px solid ${t.borderFocus};
-  outline-offset: 2px;
 }
 `.trim();
 
@@ -543,8 +511,6 @@ const defaults = {
   selector:
     "form:not([data-keystone-ignore-form]):not([data-a11y-ignore-form])",
   validationMode: ["submit", "blur"],
-  showErrorSummary: true,
-  focusErrorSummary: true,
   disableNativeValidation: true,
   messages: {
     required: "This field is required!",
@@ -573,7 +539,6 @@ function buildFieldMessageOverrides(messages = {}) {
 function hasRemoteConfigShape(options) {
   return (
     "validation_mode" in options ||
-    "show_error_summary" in options ||
     "disable_native_validation" in options ||
     "error_colors" in options
   );
@@ -682,34 +647,11 @@ function validateField(field, config) {
   return null;
 }
 
-function summary(form, errors, config) {
-  form
-    .querySelector("[data-keystone-error-summary], [data-a11y-error-summary]")
-    ?.remove();
-  if (!errors.length || !config.showErrorSummary) return;
-  const wrap = document.createElement("div");
-  wrap.dataset.keystoneErrorSummary = "";
-  wrap.tabIndex = -1;
-  wrap.setAttribute("role", "alert");
-  wrap.className = "keystone-error-summary";
-  const heading = document.createElement("h2");
-  heading.textContent = `There ${errors.length === 1 ? "is" : "are"} ${errors.length} ${errors.length === 1 ? "error" : "errors"} in this form`;
-  const list = document.createElement("ul");
-  errors.forEach(({ field, text }) => {
-    const li = document.createElement("li");
-    const a = document.createElement("a");
-    a.href = `#${field.id}`;
-    a.textContent = text;
-    a.addEventListener("click", (event) => {
-      event.preventDefault();
-      field.focus();
-    });
-    li.append(a);
-    list.append(li);
-  });
-  wrap.append(heading, list);
-  form.prepend(wrap);
-  if (config.focusErrorSummary) wrap.focus();
+function focusFirstInvalidField(errors) {
+  const field = errors[0]?.field;
+  if (field instanceof HTMLElement && typeof field.focus === "function") {
+    field.focus();
+  }
 }
 
 function normalizeMode(mode) {
@@ -725,10 +667,6 @@ function mapRemoteConfig(data) {
   if (!data || typeof data !== "object") return {};
   return {
     validationMode: normalizeMode(data.validation_mode ?? data.validationMode),
-    showErrorSummary:
-      data.show_error_summary ?? data.showErrorSummary ?? defaults.showErrorSummary,
-    focusErrorSummary:
-      data.focus_error_summary ?? data.focusErrorSummary ?? defaults.focusErrorSummary,
     disableNativeValidation:
       data.disable_native_validation ??
       data.disableNativeValidation ??
@@ -797,7 +735,7 @@ function attachForm(form, config) {
       .filter((item) => item.text);
     if (errors.length) {
       event.preventDefault();
-      summary(form, errors, config);
+      focusFirstInvalidField(errors);
     }
   });
 }
@@ -863,14 +801,6 @@ function createValidator(options = {}) {
         resolved.validation_mode ??
         defaults.validationMode,
     ),
-    showErrorSummary:
-      resolved.showErrorSummary ??
-      resolved.show_error_summary ??
-      defaults.showErrorSummary,
-    focusErrorSummary:
-      resolved.focusErrorSummary ??
-      resolved.focus_error_summary ??
-      defaults.focusErrorSummary,
     disableNativeValidation:
       resolved.disableNativeValidation ??
       resolved.disable_native_validation ??
@@ -920,7 +850,7 @@ function createValidator(options = {}) {
       const errors = fields(form)
         .map((field) => ({ field, text: validateField(field, config) }))
         .filter((item) => item.text);
-      if (errors.length) summary(form, errors, config);
+      if (errors.length) focusFirstInvalidField(errors);
       return errors;
     },
   };

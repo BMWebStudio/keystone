@@ -24,7 +24,7 @@ export default async function ProjectPage({ params }: RouteContext) {
   const { data: project, error } = await supabase
     .from("projects")
     .select(
-      "id,name,domain,public_key,is_active,project_settings(validation_mode,show_error_summary,disable_native_validation,messages,error_colors)",
+      "id,name,domain,public_key,is_active,project_settings(validation_mode,disable_native_validation,messages,error_colors)",
     )
     .eq("id", projectId)
     .eq("user_id", user.id)

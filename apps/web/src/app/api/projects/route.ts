@@ -12,7 +12,7 @@ export async function GET() {
   const { data, error } = await supabase
     .from("projects")
     .select(
-      "id,name,domain,public_key,is_active,created_at,updated_at,project_settings(validation_mode,show_error_summary,disable_native_validation)",
+      "id,name,domain,public_key,is_active,created_at,updated_at,project_settings(validation_mode,disable_native_validation)",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });

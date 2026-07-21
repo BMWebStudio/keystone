@@ -37,7 +37,7 @@ Two independent layers that share no runtime code:
 
 Framework-independent browser JavaScript. No React, no Next.js, no Supabase dependencies.
 
-- `src/index.js` — `createValidator(options?)` factory. Discovers forms unless opted out with `data-keystone-ignore-form`. Injects inline errors and an error summary. Manages `aria-invalid` / `aria-describedby` without clobbering existing refs. Also exposes `autoInit()`, `listForms()`, and remote config loading via `data-keystone-project`.
+- `src/index.js` — `createValidator(options?)` factory. Discovers forms unless opted out with `data-keystone-ignore-form`. Injects inline field errors. Manages `aria-invalid` / `aria-describedby` without clobbering existing refs. Also exposes `autoInit()`, `listForms()`, and remote config loading via `data-keystone-project`.
 - `src/rules.js` — `inferRules(field)` from native HTML attributes.
 - `src/scan.js` — markup scan for missing labels, ungrouped options, duplicate ids, missing submit controls.
 - Build produces ESM in `dist/` plus drop-in `dist/validator.js` (IIFE). Synced to `apps/web/public/keystone/` on web predev/prebuild.

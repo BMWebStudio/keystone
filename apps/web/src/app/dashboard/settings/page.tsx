@@ -68,16 +68,6 @@ export default async function SettingsPage() {
                 </select>
               </FormField>
               <FormField
-                id="error-summary"
-                label="Error summary"
-                description="Show a focused summary when a form has multiple validation errors."
-              >
-                <select name="showErrorSummary" defaultValue="enabled">
-                  <option value="enabled">Enabled</option>
-                  <option value="disabled">Disabled</option>
-                </select>
-              </FormField>
-              <FormField
                 id="native-validation"
                 label="Browser native validation"
                 description="Disable native HTML validation so messages stay consistent and accessible."
