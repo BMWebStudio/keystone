@@ -10,6 +10,10 @@ coverage
 .turbo
 *.tsbuildinfo
 
+# Submission export tooling — local only on main; export script copies README into submission repo
+scripts/export-submission.mjs
+scripts/submission-README.md
+
 # Local AI / editor tooling — do not commit
 .agents/
 .claude/
