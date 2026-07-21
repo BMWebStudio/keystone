@@ -61,14 +61,23 @@ Dashboard UI: `/dashboard/projects` (create, list, edit, delete, copy embed snip
 
 ## Screenshots and demo video
 
-Use CleanShot X URL schemes on macOS. See [docs/capture-workflow.md](docs/capture-workflow.md) and the [CleanShot API docs](https://cleanshot.com/docs-api).
+Product captures for capstone review and README display. See **[docs/screenshots-and-demos.md](docs/screenshots-and-demos.md)** for what each screenshot and recording shows.
 
-```bash
-npm run capture:area -- http://localhost:3000/dashboard/projects
-npm run capture:record
-```
+| | |
+| --- | --- |
+| **Landing page** — Public marketing page with brand lockup, hero, and feature overview | **Login** — Sign-in entry with brand icon and auth fields |
+| ![Landing page](docs/screenshots/Keystone%20-%2001%20Landing%20page.png) | ![Login page](docs/screenshots/Keystone%20-%2002%20Login%20page.png) |
+| **Dashboard** — Authenticated overview with sidebar nav and workspace summary | **Projects** — Project list and create flow |
+| ![Dashboard](docs/screenshots/Keystone%20-%2003%20Dashboard.png) | ![Projects](docs/screenshots/Keystone%20-%2004%20Projects.png) |
 
-Save captures under `docs/screenshots/` for README and capstone submission.
+**Project detail** — Validation messages, error colors, and embed snippet for one project.
+
+![Project detail](docs/screenshots/Keystone%20-%2005%20Project%20page.png)
+
+**Demo recordings** (linked in [screenshots-and-demos.md](docs/screenshots-and-demos.md)):
+
+- [Landing and dashboard walkthrough](docs/screenshots/Keystone%20-%2010%20Landing%20and%20Dashboard.mp4) — Public site through sign-in into the dashboard
+- [Active site validation](docs/screenshots/Keystone%20-%2011%20Active%20Site.mp4) — Embed script validating forms on a live page
 
 ## Current scope
 

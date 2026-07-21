@@ -3,6 +3,20 @@
   gap: var(--space-6);
 }
 
+.note {
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  background: var(--info-100);
+  border: 1px solid color-mix(in srgb, var(--brand-500) 22%, transparent);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.note strong {
+  color: var(--text-primary);
+}
+
 .sections p,
 .sections li {
   color: var(--text-secondary);

@@ -32,6 +32,12 @@ export default async function InstructionsPage() {
       />
 
       <div className={styles.sections}>
+        <p className={styles.note} role="note">
+          <strong>*NOTE:</strong> More detailed instructions are coming, along
+          with form examples and guidance on how attributes change the outcome
+          of a form.
+        </p>
+
         <Card>
           <CardHeader title="Install the script" />
           <CardContent>
