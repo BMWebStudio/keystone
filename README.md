@@ -43,6 +43,8 @@ The script:
 
 Legacy embed paths and `data-a11y-*` attributes remain supported for backward compatibility.
 
+Attribute reference: [docs/data-attributes.md](docs/data-attributes.md)
+
 ## Projects API
 
 Authenticated REST endpoints (Next.js Route Handlers + Supabase RLS):

@@ -19,16 +19,22 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  color: white;
+  color: #fff;
   text-decoration: none;
   font-weight: 850;
   line-height: 1.1;
 }
 
+.brand-link:visited,
+.brand-link:hover,
+.brand-link:focus-visible {
+  color: #fff;
+}
+
 .brand-link small {
   display: block;
   margin-top: 0.25rem;
-  color: var(--brand-200);
+  color: var(--brand-100);
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -61,14 +67,19 @@
   display: block;
   padding: 0.7rem 0.8rem;
   border-radius: var(--radius-sm);
-  color: var(--brand-100);
+  color: #fff;
   text-decoration: none;
   font-weight: 650;
 }
 
-.sidebar nav a:hover {
+.sidebar nav a:visited {
+  color: #fff;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a:focus-visible {
   background: rgb(255 255 255 / 0.08);
-  color: white;
+  color: #fff;
 }
 
 .sidebar-note {

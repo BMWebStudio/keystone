@@ -6,3 +6,6 @@ Two layers that share no runtime UI framework:
 2. **`apps/web`** — Next.js dashboard + public config API that hosts `/keystone/validator.js` and project settings.
 
 Native HTML semantics are inferred first; optional `data-keystone-*` attributes customize messages and behavior (`data-a11y-*` remains supported). Forms are discovered automatically; mark a form with `data-keystone-ignore-form` to skip it.
+
+See [data-attributes.md](./data-attributes.md) for the full attribute reference,
+message priority, and FAQ.
