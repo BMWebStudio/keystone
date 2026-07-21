@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/api/require-user";
+import { validateErrorFieldContrast } from "@/lib/validations/error-colors";
 import { projectUpdateSchema } from "@/lib/validations/project";
 
 type RouteContext = {
@@ -55,6 +56,13 @@ export async function PUT(request: Request, { params }: RouteContext) {
       { error: parsed.error.errors[0]?.message ?? "Invalid request." },
       { status: 400 },
     );
+  }
+
+  if (parsed.data.error_colors !== undefined) {
+    const contrastError = validateErrorFieldContrast(parsed.data.error_colors);
+    if (contrastError) {
+      return NextResponse.json({ error: contrastError }, { status: 400 });
+    }
   }
 
   const { supabase, user } = auth;

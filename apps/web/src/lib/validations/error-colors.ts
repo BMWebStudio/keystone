@@ -27,13 +27,11 @@ export const errorColorsSchema = z
     field_background: z
       .string()
       .trim()
-      .regex(hexColorPattern, "Use a hex color such as #fdebec.")
-      .optional(),
+      .regex(hexColorPattern, "Use a hex color such as #fdebec."),
     field_background_focus: z
       .string()
       .trim()
-      .regex(hexColorPattern, "Use a hex color such as #f5c2c7.")
-      .optional(),
+      .regex(hexColorPattern, "Use a hex color such as #f5c2c7."),
   })
   .strict();
 
@@ -51,20 +49,13 @@ export function mergeErrorFieldColors(
 
 export function serializeErrorFieldColors(
   colors: ErrorFieldColors,
-): Partial<ErrorFieldColors> {
-  const payload: Partial<ErrorFieldColors> = {};
-
-  if (colors.field_background !== DEFAULT_ERROR_FIELD_COLORS.field_background) {
-    payload.field_background = colors.field_background;
-  }
-  if (
-    colors.field_background_focus !==
-    DEFAULT_ERROR_FIELD_COLORS.field_background_focus
-  ) {
-    payload.field_background_focus = colors.field_background_focus;
-  }
-
-  return payload;
+): ErrorFieldColors {
+  return {
+    field_background: normalizeHexColor(colors.field_background) ?? colors.field_background,
+    field_background_focus:
+      normalizeHexColor(colors.field_background_focus) ??
+      colors.field_background_focus,
+  };
 }
 
 export function applyBackgroundColorChange(
