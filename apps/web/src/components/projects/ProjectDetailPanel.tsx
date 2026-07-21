@@ -15,6 +15,7 @@ import {
   PROJECT_SETTINGS_MESSAGE_DESCRIPTIONS,
   PROJECT_SETTINGS_MESSAGE_KEYS,
   PROJECT_SETTINGS_MESSAGE_LABELS,
+  serializeProjectSettingsMessages,
   type ValidationMessages,
 } from "@/lib/validations/messages";
 import {
@@ -150,7 +151,7 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
         validation_mode: validationMode,
         show_error_summary: showErrorSummary === "enabled",
         disable_native_validation: disableNativeValidation === "disabled",
-        messages,
+        messages: serializeProjectSettingsMessages(messages),
         error_colors: serializeErrorFieldColors(errorColors),
       }),
     });

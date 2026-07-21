@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireUser } from "@/lib/api/require-user";
 import { validateErrorFieldContrast } from "@/lib/validations/error-colors";
+import { sanitizeIncomingMessages } from "@/lib/validations/messages";
 import { projectUpdateSchema } from "@/lib/validations/project";
 
 type RouteContext = {
@@ -111,7 +112,7 @@ export async function PUT(request: Request, { params }: RouteContext) {
       parsed.data.disable_native_validation;
   }
   if (parsed.data.messages !== undefined) {
-    settingsFields.messages = parsed.data.messages;
+    settingsFields.messages = sanitizeIncomingMessages(parsed.data.messages);
   }
   if (parsed.data.error_colors !== undefined) {
     settingsFields.error_colors = parsed.data.error_colors;

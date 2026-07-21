@@ -90,3 +90,23 @@ export function mergeValidationMessages(
   }
   return merged;
 }
+
+/** Persist only project-settings keys; pattern is field-level via HTML attributes. */
+export function serializeProjectSettingsMessages(
+  messages: Record<ProjectSettingsMessageKey, string>,
+): Record<ProjectSettingsMessageKey, string> {
+  return PROJECT_SETTINGS_MESSAGE_KEYS.reduce(
+    (acc, key) => {
+      const value = messages[key]?.trim();
+      acc[key] = value || DEFAULT_VALIDATION_MESSAGES[key];
+      return acc;
+    },
+    {} as Record<ProjectSettingsMessageKey, string>,
+  );
+}
+
+export function sanitizeIncomingMessages(
+  messages: ValidationMessages,
+): Record<ProjectSettingsMessageKey, string> {
+  return serializeProjectSettingsMessages(mergeValidationMessages(messages));
+}
