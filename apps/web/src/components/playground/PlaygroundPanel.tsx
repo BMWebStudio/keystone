@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { FormField } from "@/components/forms/FormField";
+import { PlaygroundFormField } from "@/components/playground/PlaygroundFormField";
 import { IssueCard } from "@/components/app/IssueCard";
 import {
   buildScanPayload,
@@ -38,6 +39,14 @@ function issueSeverity(
   return "warning";
 }
 
+type PlaygroundFieldKey = "phone" | "url" | "message";
+
+const DEFAULT_REQUIRED_FIELDS: Record<PlaygroundFieldKey, boolean> = {
+  phone: false,
+  url: false,
+  message: false,
+};
+
 function resetPlaygroundForm(root: HTMLElement) {
   const form = root.querySelector("form");
   if (!form) return;
@@ -52,6 +61,23 @@ function resetPlaygroundForm(root: HTMLElement) {
   root
     .querySelectorAll(".keystone-field-error, .a11y-field-error")
     .forEach((el) => el.remove());
+}
+
+function clearPlaygroundField(root: HTMLElement, fieldId: string) {
+  const field = root.querySelector<HTMLElement>(`#${CSS.escape(fieldId)}`);
+  if (!field) return;
+
+  delete field.dataset.keystoneDirty;
+  const errorId = `${field.id}-error`;
+  root.querySelector(`#${CSS.escape(errorId)}`)?.remove();
+  field.removeAttribute("aria-invalid");
+  field.classList.remove("keystone-field-invalid", "a11y-field-invalid");
+  const refs = (field.getAttribute("aria-describedby") || "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .filter((value) => value !== errorId);
+  if (refs.length) field.setAttribute("aria-describedby", refs.join(" "));
+  else field.removeAttribute("aria-describedby");
 }
 
 function formatValidationMode(modes: string[]) {
@@ -75,6 +101,21 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [requiredFields, setRequiredFields] = useState(DEFAULT_REQUIRED_FIELDS);
+
+  const handleRequiredChange = (
+    fieldId: PlaygroundFieldKey,
+    isRequired: boolean,
+  ) => {
+    setRequiredFields((current) => ({ ...current, [fieldId]: isRequired }));
+
+    const root = playgroundRef.current;
+    if (!root) return;
+
+    if (!isRequired) {
+      clearPlaygroundField(root, fieldId);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -85,6 +126,7 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
       if (!root) return;
 
       resetPlaygroundForm(root);
+      setRequiredFields({ ...DEFAULT_REQUIRED_FIELDS });
       setConfigNotice(null);
 
       const project = projects.find((item) => item.id === selectedProjectId);
@@ -282,31 +324,63 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
         <Card>
           <CardHeader title="Example contact form" />
           <CardContent>
+            <p className={styles["form-intro"]}>
+              Name and email are always required. Toggle Required on the other
+              fields to test optional validation, then click Test validation to
+              see live errors from your selected project settings.
+            </p>
             <div ref={playgroundRef}>
               <form
                 noValidate
                 className={styles["playground-form"]}
                 data-keystone-form-id="playground-contact"
               >
-                <FormField id="name" label="Name" required>
-                  <input id="name" name="name" autoComplete="name" />
-                </FormField>
-                <FormField
+                <PlaygroundFormField
+                  id="name"
+                  label="Name"
+                  isRequired
+                  alwaysRequired
+                >
+                  <input name="name" autoComplete="name" />
+                </PlaygroundFormField>
+                <PlaygroundFormField
                   id="email"
                   label="Email address"
-                  description="We will only use this to respond to your message."
-                  required
+                  isRequired
+                  alwaysRequired
                 >
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                  />
-                </FormField>
-                <FormField id="message" label="How can we help?">
-                  <textarea id="message" name="message" rows={5} />
-                </FormField>
+                  <input name="email" type="email" autoComplete="email" />
+                </PlaygroundFormField>
+                <PlaygroundFormField
+                  id="phone"
+                  label="Phone number"
+                  isRequired={requiredFields.phone}
+                  onRequiredChange={(isRequired) =>
+                    handleRequiredChange("phone", isRequired)
+                  }
+                >
+                  <input name="phone" type="tel" autoComplete="tel" />
+                </PlaygroundFormField>
+                <PlaygroundFormField
+                  id="url"
+                  label="Website URL"
+                  isRequired={requiredFields.url}
+                  onRequiredChange={(isRequired) =>
+                    handleRequiredChange("url", isRequired)
+                  }
+                >
+                  <input name="website" type="url" autoComplete="url" />
+                </PlaygroundFormField>
+                <PlaygroundFormField
+                  id="message"
+                  label="How can we help?"
+                  isRequired={requiredFields.message}
+                  onRequiredChange={(isRequired) =>
+                    handleRequiredChange("message", isRequired)
+                  }
+                >
+                  <textarea name="message" rows={3} />
+                </PlaygroundFormField>
                 <Button type="submit">Test validation</Button>
               </form>
             </div>

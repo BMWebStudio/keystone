@@ -11,6 +11,7 @@ export const defaultFieldMessages = {
   },
   phone: {
     required: "Enter your phone number.",
+    phone: "Enter a valid phone number.",
     pattern: "Enter a valid phone number.",
     minLength: "Enter a complete phone number.",
   },
@@ -29,6 +30,7 @@ export const defaultFieldMessages = {
   },
   url: {
     required: "Enter a website URL.",
+    url: "Enter a valid website URL.",
     pattern: "Enter a valid website URL.",
   },
   address: {

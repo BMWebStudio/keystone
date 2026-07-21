@@ -37,6 +37,21 @@ const rules = {
   email(field) {
     return !field.value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value);
   },
+  phone(field) {
+    const value = String(field.value ?? "").trim();
+    if (!value) return true;
+    return /^[\d\s\-+().]{7,}$/.test(value);
+  },
+  url(field) {
+    const value = String(field.value ?? "").trim();
+    if (!value) return true;
+    try {
+      const parsed = new URL(value);
+      return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch {
+      return false;
+    }
+  },
   minLength(field) {
     return !field.value || field.value.length >= field.minLength;
   },
@@ -56,6 +71,8 @@ function inferRules(field) {
   const list = [];
   if (field.required) list.push("required");
   if (field.type === "email") list.push("email");
+  if (field.type === "tel") list.push("phone");
+  if (field.type === "url") list.push("url");
   if (field.minLength > 0) list.push("minLength");
   if (field.maxLength > 0) list.push("maxLength");
   if (field.pattern) list.push("pattern");
@@ -75,6 +92,7 @@ const defaultFieldMessages = {
   },
   phone: {
     required: "Enter your phone number.",
+    phone: "Enter a valid phone number.",
     pattern: "Enter a valid phone number.",
     minLength: "Enter a complete phone number.",
   },
@@ -93,6 +111,7 @@ const defaultFieldMessages = {
   },
   url: {
     required: "Enter a website URL.",
+    url: "Enter a valid website URL.",
     pattern: "Enter a valid website URL.",
   },
   address: {

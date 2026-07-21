@@ -23,3 +23,26 @@ describe("rules.email", () => {
     assert.equal(rules.email({ value: "nope" }), false);
   });
 });
+
+describe("rules.phone", () => {
+  it("accepts empty values and valid phone numbers", () => {
+    assert.equal(rules.phone({ value: "" }), true);
+    assert.equal(rules.phone({ value: "(617) 555-0100" }), true);
+    assert.equal(rules.phone({ value: "abc" }), false);
+  });
+});
+
+describe("rules.url", () => {
+  it("accepts empty values and valid http(s) URLs", () => {
+    assert.equal(rules.url({ value: "" }), true);
+    assert.equal(rules.url({ value: "https://example.com" }), true);
+    assert.equal(rules.url({ value: "not-a-url" }), false);
+  });
+});
+
+describe("inferRules tel and url", () => {
+  it("detects phone and url rules from input type", () => {
+    assert.deepEqual(inferRules({ type: "tel", required: false, minLength: -1, maxLength: -1, pattern: "" }), ["phone"]);
+    assert.deepEqual(inferRules({ type: "url", required: true, minLength: -1, maxLength: -1, pattern: "" }), ["required", "url"]);
+  });
+});
