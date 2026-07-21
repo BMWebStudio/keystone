@@ -80,6 +80,16 @@
         <label for="message">Message</label>
         <textarea id="message" name="message"></textarea>
       </div>
+      <div>
+        <label for="postal">Postal code</label>
+        <input
+          id="postal"
+          name="postal"
+          pattern="[0-9]{5}"
+          data-a11y-message-pattern="Enter a 5-digit postal code."
+          required
+        />
+      </div>
       <button type="submit">Send</button>
     </form>
 

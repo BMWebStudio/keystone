@@ -494,13 +494,28 @@ const defaults = {
   focusErrorSummary: true,
   disableNativeValidation: true,
   messages: {
-    required: "Complete this field.",
+    required: "This field is required!",
     email: "Enter an email address in the format name@example.com.",
+    name: "Enter your name.",
+    phone: "Enter a valid phone number.",
+    url: "Enter a valid website URL.",
     minLength: "Enter more characters.",
     maxLength: "Enter fewer characters.",
     pattern: "Use the requested format.",
   },
 };
+
+function buildFieldMessageOverrides(messages = {}) {
+  const overrides = {};
+  for (const kind of ["name", "phone", "url"]) {
+    const copy = messages[kind];
+    if (!copy || !defaultFieldMessages[kind]) continue;
+    overrides[kind] = Object.fromEntries(
+      Object.keys(defaultFieldMessages[kind]).map((rule) => [rule, copy]),
+    );
+  }
+  return overrides;
+}
 
 function fields(form) {
   return [
@@ -734,6 +749,7 @@ function createValidator(options = {}) {
     messages: { ...defaults.messages, ...options.messages },
     fieldMessages: {
       ...defaultFieldMessages,
+      ...buildFieldMessageOverrides(options.messages),
       ...options.fieldMessages,
     },
     errorColors: options.errorColors ?? {},

@@ -47,7 +47,7 @@ describe("inferFieldKind", () => {
 
 describe("resolveFieldMessage", () => {
   const generic = {
-    required: "Complete this field.",
+    required: "This field is required!",
     email: "Enter an email address in the format name@example.com.",
   };
 
@@ -68,6 +68,24 @@ describe("resolveFieldMessage", () => {
     assert.equal(
       resolveFieldMessage(field, "required", { messages: generic }, generic),
       defaultFieldMessages.email.required,
+    );
+  });
+
+  it("uses project name message overrides for inferred name fields", () => {
+    const field = mockField({ name: "first_name" });
+    assert.equal(
+      resolveFieldMessage(
+        field,
+        "required",
+        {
+          messages: { name: "Please provide your name." },
+          fieldMessages: {
+            name: { required: "Please provide your name." },
+          },
+        },
+        generic,
+      ),
+      "Please provide your name.",
     );
   });
 

@@ -12,8 +12,9 @@ import detailStyles from "@/app/dashboard/projects/[projectId]/project.module.cs
 import {
   DEFAULT_VALIDATION_MESSAGES,
   mergeValidationMessages,
-  VALIDATION_MESSAGE_KEYS,
-  VALIDATION_MESSAGE_LABELS,
+  PROJECT_SETTINGS_MESSAGE_DESCRIPTIONS,
+  PROJECT_SETTINGS_MESSAGE_KEYS,
+  PROJECT_SETTINGS_MESSAGE_LABELS,
   type ValidationMessages,
 } from "@/lib/validations/messages";
 import {
@@ -314,12 +315,22 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
               <code>data-a11y-message-required</code>,{" "}
               <code>data-a11y-message-email</code>, and similar attributes.
             </p>
+            <p className={styles["message-fieldset-note"]}>
+              For custom formats, add a <code>pattern</code> attribute on the
+              field and set{" "}
+              <code>data-a11y-message-pattern=&quot;Your message here&quot;</code>{" "}
+              on that same input. Pattern messages are field-specific, so you do
+              not need a project setting for them. If no field message is set,
+              the validator uses the built-in fallback: &quot;
+              {DEFAULT_VALIDATION_MESSAGES.pattern}&quot;
+            </p>
             <div className={styles["message-fields"]}>
-              {VALIDATION_MESSAGE_KEYS.map((key) => (
+              {PROJECT_SETTINGS_MESSAGE_KEYS.map((key) => (
                 <FormField
                   key={key}
                   id={`message-${key}`}
-                  label={VALIDATION_MESSAGE_LABELS[key]}
+                  label={PROJECT_SETTINGS_MESSAGE_LABELS[key]}
+                  description={PROJECT_SETTINGS_MESSAGE_DESCRIPTIONS[key]}
                 >
                   <input
                     name={`message-${key}`}
