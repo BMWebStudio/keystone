@@ -224,7 +224,6 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
     }
   }
 
-  const recommendedTextColor = getRecommendedFieldTextColor(errorColors);
   const previewTextColor = resolveFieldTextColor(errorColors);
 
   function handleErrorBackgroundChange(nextBackground: string) {
@@ -376,23 +375,6 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
         <Card>
           <CardHeader title="Validation messages" />
           <CardContent>
-            <p className={styles["message-fieldset-note"]}>
-              Default copy for every form using this project key. Override
-              individual fields in markup with{" "}
-              <code>data-keystone-message-required</code>,{" "}
-              <code>data-keystone-message-email</code>, and similar attributes.
-              Legacy <code>data-a11y-message-*</code> attributes are still
-              supported.
-            </p>
-            <p className={styles["message-fieldset-note"]}>
-              For custom formats, add a <code>pattern</code> attribute on the
-              field and set{" "}
-              <code>data-keystone-message-pattern=&quot;Your message here&quot;</code>{" "}
-              on that same input. Pattern messages are field-specific, so you do
-              not need a project setting for them. If no field message is set,
-              the validator uses the built-in fallback: &quot;
-              {DEFAULT_VALIDATION_MESSAGES.pattern}&quot;
-            </p>
             <div className={styles["message-fields"]}>
               {PROJECT_SETTINGS_MESSAGE_KEYS.map((key) => (
                 <FormField
@@ -421,13 +403,6 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
         <Card>
           <CardHeader title="Error field colors" />
           <CardContent>
-            <p className={styles["message-fieldset-note"]}>
-              Customize the background and text colors applied to invalid fields
-              on your site. When you change a background, Keystone recommends a
-              text color that meets WCAG AA contrast of {WCAG_AA_CONTRAST_MIN}:1
-              against both backgrounds. You can override the text color to
-              preview a custom choice before saving.
-            </p>
             <div className={styles["color-settings-layout"]}>
               <div className={styles["color-controls"]}>
                 <div className={formFieldStyles["form-field"]}>
@@ -499,10 +474,6 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                   <label htmlFor="error-field-text">
                     Invalid field text color
                   </label>
-                  <p className={styles["color-sync-note"]}>
-                    Recommended: <code>{recommendedTextColor}</code>
-                    {textColorCustomized ? " (custom override)" : ""}
-                  </p>
                   <div className={styles["color-input-row"]}>
                     <input
                       type="color"
@@ -520,7 +491,6 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                       onChange={(event) =>
                         handleErrorTextColorChange(event.target.value)
                       }
-                      placeholder={recommendedTextColor}
                     />
                   </div>
                   {textColorCustomized ? (
@@ -530,7 +500,7 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                       variant="secondary"
                       onClick={applyRecommendedTextColor}
                     >
-                      Use recommended color
+                      Sync with backgrounds
                     </Button>
                   ) : null}
                 </div>
@@ -545,32 +515,54 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
               </div>
               <div className={styles["color-preview"]}>
                 <p className={styles["color-preview-label"]}>Preview</p>
-                <input
-                  className={styles["color-preview-field"]}
-                  aria-invalid="true"
-                  readOnly
-                  value="Invalid field example"
-                  style={{
-                    backgroundColor: errorColors.field_background,
-                    borderColor: "var(--danger-border)",
-                    boxShadow: "0 0 0 1px var(--danger-border)",
-                    color: previewTextColor,
-                  }}
-                />
-                <input
-                  className={`${styles["color-preview-field"]} ${styles["color-preview-field-focus"]}`}
-                  aria-invalid="true"
-                  readOnly
-                  value="Invalid field focus example"
-                  style={{
-                    backgroundColor: errorColors.field_background_focus,
-                    borderColor: "var(--danger-border-focus)",
-                    boxShadow: "0 0 0 1px var(--danger-border-focus)",
-                    outline: "3px solid var(--danger-border-focus)",
-                    outlineOffset: "2px",
-                    color: previewTextColor,
-                  }}
-                />
+                <div className={styles["color-preview-field-group"]}>
+                  <label htmlFor="color-preview-default">Email address</label>
+                  <input
+                    id="color-preview-default"
+                    className={styles["color-preview-field"]}
+                    aria-invalid="true"
+                    aria-describedby="color-preview-default-error"
+                    readOnly
+                    value="not-an-email"
+                    style={{
+                      backgroundColor: errorColors.field_background,
+                      borderColor: "var(--danger-border)",
+                      boxShadow: "0 0 0 1px var(--danger-border)",
+                      color: previewTextColor,
+                    }}
+                  />
+                  <p
+                    id="color-preview-default-error"
+                    className={styles["color-preview-error"]}
+                  >
+                    {messages.email}
+                  </p>
+                </div>
+                <div className={styles["color-preview-field-group"]}>
+                  <label htmlFor="color-preview-focus">Email address</label>
+                  <input
+                    id="color-preview-focus"
+                    className={`${styles["color-preview-field"]} ${styles["color-preview-field-focus"]}`}
+                    aria-invalid="true"
+                    aria-describedby="color-preview-focus-error"
+                    readOnly
+                    value="not-an-email"
+                    style={{
+                      backgroundColor: errorColors.field_background_focus,
+                      borderColor: "var(--danger-border-focus)",
+                      boxShadow: "0 0 0 1px var(--danger-border-focus)",
+                      outline: "3px solid var(--danger-border-focus)",
+                      outlineOffset: "2px",
+                      color: previewTextColor,
+                    }}
+                  />
+                  <p
+                    id="color-preview-focus-error"
+                    className={styles["color-preview-error"]}
+                  >
+                    {messages.email}
+                  </p>
+                </div>
               </div>
             </div>
           </CardContent>

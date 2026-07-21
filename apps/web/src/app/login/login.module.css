@@ -15,11 +15,30 @@
 }
 
 .brand-link {
-  position: absolute;
-  top: var(--space-6);
-  color: var(--brand-700);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  align-self: flex-start;
+  margin-bottom: var(--space-10);
+  color: var(--text-primary);
   font-weight: 900;
+  line-height: 1.1;
   text-decoration: none;
+}
+
+.brand-link:visited,
+.brand-link:hover,
+.brand-link:focus-visible {
+  color: var(--text-primary);
+}
+
+.brand-link small {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
 }
 
 .login-page h1 {

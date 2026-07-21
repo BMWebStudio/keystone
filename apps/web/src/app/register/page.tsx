@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { RegisterForm } from "@/components/auth/RegisterForm";
+import { BrandIcon } from "@/components/brand/BrandIcon";
 import styles from "../login/login.module.css";
 
 export default function Register() {
@@ -7,7 +8,11 @@ export default function Register() {
     <main className={styles["login-page"]}>
       <section>
         <Link href="/" className={styles["brand-link"]}>
-          BM / Keystone
+          <BrandIcon size="compact" />
+          <span>
+            Keystone
+            <small>by BM Web Studio</small>
+          </span>
         </Link>
         <div>
           <p>Get started</p>

@@ -1,29 +1,39 @@
 import Link from "next/link";
+import { BrandIcon } from "@/components/brand/BrandIcon";
 import styles from "./page.module.css";
 
 export default function Home() {
   return (
     <main className={styles["landing-page"]}>
       <nav>
-        <strong>BM / Keystone</strong>
+        <Link className={styles["brand-link"]} href="/">
+          <BrandIcon />
+          <span className={styles["brand-name"]}>
+            Keystone
+            <small>by BM Web Studio</small>
+          </span>
+        </Link>
         <div className={styles["nav-links"]}>
           <Link href="/login">Sign in</Link>
           <Link href="/register">Create account</Link>
         </div>
       </nav>
       <section className={styles.hero}>
-        <p>Platform-independent form accessibility</p>
-        <h1>
+        <h1>Keystone</h1>
+        <p className={styles["hero-descriptor"]}>
+          Platform-independent form accessibility
+        </p>
+        <h2>
           Better errors.
           <br />
           Better forms.
           <br />
           <em>Better access.</em>
-        </h1>
-        <span>
+        </h2>
+        <p className={styles["hero-lede"]}>
           Scan, configure, and install accessible form validation without
           rebuilding your forms or locking into one platform.
-        </span>
+        </p>
         <div>
           <Link className={styles["cta-primary"]} href="/register">
             Create free account

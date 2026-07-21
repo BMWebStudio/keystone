@@ -1,0 +1,10 @@
+.icon {
+  display: block;
+  width: clamp(4rem, 10vw, 7rem);
+  height: auto;
+  flex-shrink: 0;
+}
+
+.compact {
+  width: clamp(2.75rem, 5vw, 3.5rem);
+}

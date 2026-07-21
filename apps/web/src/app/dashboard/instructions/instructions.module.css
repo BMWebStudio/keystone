@@ -1,0 +1,38 @@
+.sections {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.sections p,
+.sections li {
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.sections ul,
+.sections ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.sections code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+
+.message-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.message-list li {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.message-list strong {
+  color: var(--text-primary);
+}

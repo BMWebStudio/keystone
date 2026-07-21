@@ -13,46 +13,48 @@
   padding: var(--space-6);
   background: var(--brand-900);
   color: white;
+  --brand-width: min(100%, 12rem);
+  --footer-logo-width: calc(var(--brand-width) * 0.65);
+  --content-indent: var(--space-3);
 }
 
-.brand-link {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
+.brand-header {
+  display: grid;
+  gap: 0.35rem;
+  width: var(--brand-width);
   color: #fff;
   text-decoration: none;
-  font-weight: 850;
-  line-height: 1.1;
 }
 
-.brand-link:visited,
-.brand-link:hover,
-.brand-link:focus-visible {
+.brand-header:visited,
+.brand-header:hover,
+.brand-header:focus-visible {
   color: #fff;
 }
 
-.brand-link small {
-  display: block;
-  margin-top: 0.25rem;
-  color: var(--brand-100);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+.product-name {
+  margin: 0;
+  font-size: clamp(1.65rem, 3.3vw, 2.025rem);
+  font-weight: 850;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
 }
 
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: var(--radius-sm);
-  background: var(--accent-400);
-  color: var(--brand-900);
-  font-weight: 900;
+.product-descriptor {
+  margin: 0;
+  color: var(--brand-100);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
 }
 
 .sidebar nav {
-  margin-top: var(--space-12);
+  margin-top: var(--space-8);
+}
+
+.sidebar nav ul {
+  padding-left: var(--content-indent);
 }
 
 .sidebar ul {
@@ -63,13 +65,21 @@
   list-style: none;
 }
 
-.sidebar nav a {
+.sidebar nav a,
+.sidebar-sign-out {
   display: block;
-  padding: 0.7rem 0.8rem;
+  width: 100%;
+  padding: 0.65rem 0.5rem 0.65rem 0;
+  border: 0;
   border-radius: var(--radius-sm);
+  background: transparent;
   color: #fff;
-  text-decoration: none;
+  font: inherit;
   font-weight: 650;
+  line-height: 1.3;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .sidebar nav a:visited {
@@ -77,13 +87,21 @@
 }
 
 .sidebar nav a:hover,
-.sidebar nav a:focus-visible {
+.sidebar nav a:focus-visible,
+.sidebar-sign-out:hover,
+.sidebar-sign-out:focus-visible {
   background: rgb(255 255 255 / 0.08);
   color: #fff;
 }
 
+.sidebar-sign-out:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 .sidebar-note {
   margin-top: auto;
+  width: 100%;
   display: grid;
   gap: 0.3rem;
   padding: var(--space-4);
@@ -91,6 +109,32 @@
   border-radius: var(--radius-md);
   color: var(--brand-100);
   font-size: var(--text-sm);
+}
+
+.sidebar-footer {
+  margin-top: var(--space-4);
+  width: 100%;
+}
+
+.footer-brand-link {
+  display: block;
+  width: var(--footer-logo-width);
+  color: #fff;
+  text-decoration: none;
+}
+
+.footer-brand-link:visited,
+.footer-brand-link:hover,
+.footer-brand-link:focus-visible {
+  color: #fff;
+}
+
+.footer-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding-left: 0.75rem;
 }
 
 .main-content {
@@ -111,9 +155,11 @@
 
   .sidebar nav ul {
     grid-template-columns: repeat(3, 1fr);
+    padding-left: 0;
   }
 
-  .sidebar-note {
+  .sidebar-note,
+  .sidebar-footer {
     display: none;
   }
 

@@ -45,10 +45,21 @@ export const errorColorsSchema = z
 export function getRecommendedFieldTextColor(
   colors: Pick<ErrorFieldColors, "field_background" | "field_background_focus">,
 ): string {
-  return suggestAccessibleTextColor([
+  const backgrounds = [
     colors.field_background,
     colors.field_background_focus,
-  ]);
+  ];
+
+  const defaultPasses = backgrounds.every((background) => {
+    const result = evaluateContrast(ERROR_FIELD_TEXT_COLOR, background);
+    return result?.passes ?? false;
+  });
+
+  if (defaultPasses) {
+    return ERROR_FIELD_TEXT_COLOR;
+  }
+
+  return suggestAccessibleTextColor(backgrounds);
 }
 
 export function resolveFieldTextColor(colors: ErrorFieldColors): string {

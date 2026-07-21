@@ -34,6 +34,29 @@ export const DEFAULT_VALIDATION_MESSAGES: Record<ValidationMessageKey, string> =
     maxLength: "Enter fewer characters.",
   };
 
+/** Superseded defaults still stored on older projects. */
+const LEGACY_VALIDATION_MESSAGES: Partial<
+  Record<ProjectSettingsMessageKey, string>
+> = {
+  required: "Complete this field.",
+};
+
+function isLegacyStoredMessage(
+  key: ProjectSettingsMessageKey,
+  value: string,
+): boolean {
+  return LEGACY_VALIDATION_MESSAGES[key] === value.trim();
+}
+
+function normalizeStoredMessageValue(
+  key: ProjectSettingsMessageKey,
+  value: string | undefined,
+): string | undefined {
+  if (!value?.trim()) return undefined;
+  if (isLegacyStoredMessage(key, value)) return undefined;
+  return value.trim();
+}
+
 export const PROJECT_SETTINGS_MESSAGE_LABELS: Record<
   ProjectSettingsMessageKey,
   string
@@ -86,7 +109,8 @@ export function mergeValidationMessages(
 
   const merged = { ...defaults };
   for (const key of PROJECT_SETTINGS_MESSAGE_KEYS) {
-    if (saved?.[key]) merged[key] = saved[key]!;
+    const normalized = normalizeStoredMessageValue(key, saved?.[key]);
+    if (normalized) merged[key] = normalized;
   }
   return merged;
 }
@@ -98,7 +122,10 @@ export function serializeProjectSettingsMessages(
   return PROJECT_SETTINGS_MESSAGE_KEYS.reduce(
     (acc, key) => {
       const value = messages[key]?.trim();
-      acc[key] = value || DEFAULT_VALIDATION_MESSAGES[key];
+      acc[key] =
+        value && !isLegacyStoredMessage(key, value)
+          ? value
+          : DEFAULT_VALIDATION_MESSAGES[key];
       return acc;
     },
     {} as Record<ProjectSettingsMessageKey, string>,

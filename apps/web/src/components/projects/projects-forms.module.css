@@ -104,6 +104,24 @@
   font-size: var(--text-sm);
 }
 
+.color-preview-field-group {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.color-preview-field-group label {
+  color: var(--text-primary);
+  font-weight: 750;
+}
+
+.color-preview-error {
+  margin: 0;
+  color: var(--danger-text);
+  font-size: 0.875rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
 .color-preview-field {
   width: 100%;
   padding: var(--space-3);

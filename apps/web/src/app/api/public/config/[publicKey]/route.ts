@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { mergeValidationMessages } from "@/lib/validations/messages";
 import {
   publicCorsHeaders,
   publicOptionsResponse,
@@ -28,9 +29,15 @@ export async function GET(
       { error: "Project configuration not found" },
       { status: 404, headers: publicCorsHeaders() },
     );
-  return NextResponse.json(data, {
-    headers: publicCorsHeaders({
-      "Cache-Control": "no-store",
-    }),
-  });
+  return NextResponse.json(
+    {
+      ...data,
+      messages: mergeValidationMessages(data.messages),
+    },
+    {
+      headers: publicCorsHeaders({
+        "Cache-Control": "no-store",
+      }),
+    },
+  );
 }

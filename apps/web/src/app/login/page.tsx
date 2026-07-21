@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { BrandIcon } from "@/components/brand/BrandIcon";
 import styles from "./login.module.css";
 
 export default function Login() {
@@ -8,7 +9,11 @@ export default function Login() {
     <main className={styles["login-page"]}>
       <section>
         <Link href="/" className={styles["brand-link"]}>
-          BM / Keystone
+          <BrandIcon size="compact" />
+          <span>
+            Keystone
+            <small>by BM Web Studio</small>
+          </span>
         </Link>
         <div>
           <p>Welcome back</p>
