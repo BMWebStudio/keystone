@@ -50,12 +50,16 @@ export type ProjectDetailData = {
   project_settings: ProjectSettings | ProjectSettings[] | null;
 };
 
+function normalizeValidationMode(mode: string): "submit" | "blur" {
+  return mode === "submit" ? "submit" : "blur";
+}
+
 function getSettings(
   settings: ProjectSettings | ProjectSettings[] | null,
 ): ProjectSettings {
   if (Array.isArray(settings)) {
     return settings[0] ?? {
-      validation_mode: "submit",
+      validation_mode: "blur",
       show_error_summary: true,
       disable_native_validation: true,
     };
@@ -63,7 +67,7 @@ function getSettings(
 
   return (
     settings ?? {
-      validation_mode: "submit",
+      validation_mode: "blur",
       show_error_summary: true,
       disable_native_validation: true,
     }
@@ -103,7 +107,9 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
 
   const [name, setName] = useState(project.name);
   const [domain, setDomain] = useState(project.domain ?? "");
-  const [validationMode, setValidationMode] = useState(settings.validation_mode);
+  const [validationMode, setValidationMode] = useState(
+    normalizeValidationMode(settings.validation_mode),
+  );
   const [showErrorSummary, setShowErrorSummary] = useState(
     settings.show_error_summary ? "enabled" : "disabled",
   );
@@ -243,11 +249,14 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                   <select
                     name="validationMode"
                     value={validationMode}
-                    onChange={(event) => setValidationMode(event.target.value)}
+                    onChange={(event) =>
+                      setValidationMode(
+                        normalizeValidationMode(event.target.value),
+                      )
+                    }
                   >
                     <option value="submit">Submit only</option>
-                    <option value="blur">Blur + submit</option>
-                    <option value="change">Change + submit</option>
+                    <option value="blur">Blur + submit (Recommended)</option>
                   </select>
                 </FormField>
                 <FormField id="edit-error-summary" label="Error summary">

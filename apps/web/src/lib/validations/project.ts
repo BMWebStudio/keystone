@@ -22,7 +22,7 @@ export const projectUpdateSchema = z.object({
     .optional()
     .transform((value) => (value === "" ? null : value)),
   is_active: z.boolean().optional(),
-  validation_mode: z.enum(["submit", "blur", "change"]).optional(),
+  validation_mode: z.enum(["submit", "blur"]).optional(),
   show_error_summary: z.boolean().optional(),
   disable_native_validation: z.boolean().optional(),
   messages: validationMessagesSchema.optional(),

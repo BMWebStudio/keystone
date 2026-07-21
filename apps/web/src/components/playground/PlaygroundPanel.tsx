@@ -58,8 +58,7 @@ function resetPlaygroundForm(root: HTMLElement) {
 }
 
 function formatValidationMode(modes: string[]) {
-  if (modes.includes("change")) return "Change + submit";
-  if (modes.includes("blur")) return "Blur + submit";
+  if (modes.includes("blur")) return "Blur + submit (Recommended)";
   return "Submit only";
 }
 
@@ -69,7 +68,9 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
   const [selectedProjectId, setSelectedProjectId] = useState(
     projects[0]?.id ?? "",
   );
-  const [validationModeLabel, setValidationModeLabel] = useState("Submit only");
+  const [validationModeLabel, setValidationModeLabel] = useState(
+    "Blur + submit (Recommended)",
+  );
   const [scanPayload, setScanPayload] = useState<ScanPayload | null>(null);
   const [scanIssues, setScanIssues] = useState<ScanIssue[]>([]);
   const [formError, setFormError] = useState<string | null>(null);

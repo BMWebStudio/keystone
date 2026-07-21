@@ -637,7 +637,7 @@ function markSubmitAttempted(form) {
   form.dataset.keystoneSubmitAttempted = "true";
 }
 
-/** Blur/change validation — skip untouched empty fields until submit. */
+/** Blur validation — skip untouched empty fields until submit. */
 function validateFieldInteractive(field, config, form) {
   if (
     !formSubmitAttempted(form) &&
@@ -697,8 +697,7 @@ function normalizeMode(mode) {
   if (typeof mode !== "string" || !mode.trim()) return defaults.validationMode;
   const value = mode.trim().toLowerCase();
   if (value === "submit") return ["submit"];
-  if (value === "blur") return ["submit", "blur"];
-  if (value === "change") return ["submit", "blur", "change"];
+  if (value === "blur" || value === "change") return ["submit", "blur"];
   return value.split(/[,\s]+/).filter(Boolean);
 }
 
@@ -749,11 +748,7 @@ function attachForm(form, config) {
 
   if (config.disableNativeValidation !== false) form.noValidate = true;
 
-  const interactive =
-    config.validationMode.includes("blur") ||
-    config.validationMode.includes("change");
-
-  if (interactive) {
+  if (config.validationMode.includes("blur")) {
     form.addEventListener("input", (event) => {
       const target = event.target;
       if (
@@ -763,28 +758,13 @@ function attachForm(form, config) {
         markFieldDirty(target);
       }
     });
-  }
 
-  if (config.validationMode.includes("blur")) {
     form.addEventListener("focusout", (event) => {
       const target = event.target;
       if (
         target instanceof HTMLElement &&
         target.matches("input,select,textarea")
       ) {
-        validateFieldInteractive(target, config, form);
-      }
-    });
-  }
-
-  if (config.validationMode.includes("change")) {
-    form.addEventListener("change", (event) => {
-      const target = event.target;
-      if (
-        target instanceof HTMLElement &&
-        target.matches("input,select,textarea")
-      ) {
-        markFieldDirty(target);
         validateFieldInteractive(target, config, form);
       }
     });

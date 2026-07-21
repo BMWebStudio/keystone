@@ -65,6 +65,7 @@ export async function POST(request: Request) {
 
   const { error: settingsError } = await supabase.from("project_settings").insert({
     project_id: project.id,
+    validation_mode: "blur",
   });
 
   if (settingsError) {

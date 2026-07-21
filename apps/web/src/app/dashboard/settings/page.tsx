@@ -62,10 +62,9 @@ export default async function SettingsPage() {
                 label="Validation mode"
                 description="Applied when you create a project. Per-project settings can still override this."
               >
-                <select name="validationMode" defaultValue="submit">
+                <select name="validationMode" defaultValue="blur">
                   <option value="submit">Submit only</option>
-                  <option value="blur">Blur + submit</option>
-                  <option value="change">Change + submit</option>
+                  <option value="blur">Blur + submit (Recommended)</option>
                 </select>
               </FormField>
               <FormField
