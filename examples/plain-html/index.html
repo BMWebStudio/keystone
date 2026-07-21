@@ -28,13 +28,28 @@
         padding: 0.7rem;
       }
       .a11y-field-error {
-        color: #a42c35;
+        color: #6b1a22;
         margin: 0.25rem 0;
+        font-weight: 650;
+      }
+      input[aria-invalid="true"],
+      textarea[aria-invalid="true"] {
+        background: #fdebec;
+        border: 1px solid #8a2329;
+        box-shadow: 0 0 0 1px #8a2329;
+      }
+      input[aria-invalid="true"]:focus-visible,
+      textarea[aria-invalid="true"]:focus-visible {
+        background: #f5c2c7;
+        border-color: #6b1a22;
+        outline: 3px solid #6b1a22;
+        outline-offset: 2px;
       }
       .a11y-error-summary {
         padding: 1rem;
         background: #fdebec;
-        border-left: 4px solid #a42c35;
+        border-left: 4px solid #8a2329;
+        color: #6b1a22;
       }
       pre {
         overflow: auto;
@@ -55,12 +70,7 @@
     <form>
       <div>
         <label for="name">Name</label>
-        <input
-          id="name"
-          name="name"
-          required
-          data-a11y-message-required="Enter your name."
-        />
+        <input id="name" name="name" required />
       </div>
       <div>
         <label for="email">Email</label>
@@ -80,8 +90,8 @@
     </form>
 
     <!--
-      Production install (served by the Next app):
-      <script src="http://localhost:3000/validator/a11y-validator.js" data-a11y-project="proj_xxx" defer></script>
+      Production install (Vercel):
+      <script src="https://keystone-web-tmld.vercel.app/validator/a11y-validator.js" data-a11y-project="proj_xxx" defer></script>
     -->
     <script type="module">
       import {

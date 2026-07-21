@@ -23,6 +23,13 @@
   --warning-700: #7d5600;
   --danger-100: #fdebec;
   --danger-700: #a42c35;
+  --danger-800: #8a2329;
+  --danger-900: #6b1a22;
+  --danger-surface: var(--danger-100);
+  --danger-surface-focus: #f5c2c7;
+  --danger-text: var(--danger-900);
+  --danger-border: var(--danger-800);
+  --danger-border-focus: var(--danger-900);
   --info-100: #eaf2ff;
   --info-700: #285ca4;
   --surface-page: var(--neutral-50);

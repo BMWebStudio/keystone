@@ -1,5 +1,11 @@
 import { inferRules, rules } from "./rules.js";
 import { scanDocument, summarizeScan } from "./scan.js";
+import {
+  defaultFieldMessages,
+  inferFieldKind,
+  resolveFieldMessage,
+} from "./field-messages.js";
+import { injectDefaultStyles } from "./styles.js";
 
 const defaults = {
   /** Track every form unless it opts out with data-a11y-ignore-form */
@@ -24,14 +30,14 @@ function fields(form) {
 }
 
 function message(field, rule, config) {
-  const key = `a11yMessage${rule[0].toUpperCase()}${rule.slice(1)}`;
-  return field.dataset[key] || config.messages[rule];
+  return resolveFieldMessage(field, rule, config, config.messages);
 }
 
 function clear(field) {
   const id = `${field.id}-error`;
   document.getElementById(id)?.remove();
   field.removeAttribute("aria-invalid");
+  field.classList.remove("a11y-field-invalid");
   const refs = (field.getAttribute("aria-describedby") || "")
     .split(/\s+/)
     .filter(Boolean)
@@ -51,6 +57,7 @@ function show(field, text) {
   el.textContent = text;
   field.insertAdjacentElement("afterend", el);
   field.setAttribute("aria-invalid", "true");
+  field.classList.add("a11y-field-invalid");
   const refs = new Set(
     (field.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean),
   );
@@ -244,12 +251,17 @@ export function createValidator(options = {}) {
       options.validationMode ?? defaults.validationMode,
     ),
     messages: { ...defaults.messages, ...options.messages },
+    fieldMessages: {
+      ...defaultFieldMessages,
+      ...options.fieldMessages,
+    },
   };
 
   return {
     config,
     /** Discover forms and attach validation listeners */
     init(root = document) {
+      injectDefaultStyles();
       const scope = root.querySelectorAll ? root : document;
       scope.querySelectorAll(config.selector).forEach((form) => {
         attachForm(form, config);
@@ -289,7 +301,7 @@ export function createValidator(options = {}) {
 
 /**
  * Drop-in bootstrap for:
- * <script src="/validator/a11y-validator.js" data-a11y-project="proj_xxx" defer></script>
+ * <script src="https://keystone-web-tmld.vercel.app/validator/a11y-validator.js" data-a11y-project="proj_xxx" defer></script>
  */
 export async function autoInit(options = {}) {
   const script =
@@ -345,7 +357,7 @@ export async function autoInit(options = {}) {
   return validator;
 }
 
-export { scanDocument, summarizeScan };
+export { scanDocument, summarizeScan, inferFieldKind, defaultFieldMessages };
 
 const api = {
   createValidator,

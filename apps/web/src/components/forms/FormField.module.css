@@ -20,9 +20,22 @@
 }
 
 .form-field input[aria-invalid="true"],
-.form-field textarea[aria-invalid="true"] {
-  border-color: var(--danger-700);
-  box-shadow: 0 0 0 1px var(--danger-700);
+.form-field textarea[aria-invalid="true"],
+.form-field select[aria-invalid="true"] {
+  background: var(--danger-surface);
+  color: var(--text-primary);
+  border-color: var(--danger-border);
+  box-shadow: 0 0 0 1px var(--danger-border);
+}
+
+.form-field input[aria-invalid="true"]:focus-visible,
+.form-field textarea[aria-invalid="true"]:focus-visible,
+.form-field select[aria-invalid="true"]:focus-visible {
+  background: var(--danger-surface-focus);
+  border-color: var(--danger-border-focus);
+  box-shadow: 0 0 0 1px var(--danger-border-focus);
+  outline: 3px solid var(--danger-border-focus);
+  outline-offset: 2px;
 }
 
 .field-description {
@@ -35,7 +48,8 @@
   display: flex;
   gap: var(--space-2);
   margin: 0;
-  color: var(--danger-700);
+  color: var(--danger-text);
   font-size: var(--text-sm);
   font-weight: 650;
+  line-height: 1.45;
 }

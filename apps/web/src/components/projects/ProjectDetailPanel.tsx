@@ -55,7 +55,9 @@ function getSettings(
 export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) {
   const router = useRouter();
   const settings = getSettings(project.project_settings);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    "https://keystone-web-tmld.vercel.app";
   const snippet = `<script
   src="${appUrl}/validator/a11y-validator.js"
   data-a11y-project="${project.public_key}"

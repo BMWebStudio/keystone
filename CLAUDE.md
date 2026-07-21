@@ -34,6 +34,7 @@ cd packages/validator-core && npm test
 Two independent layers that share no runtime code:
 
 ### `packages/validator-core`
+
 Framework-independent browser JavaScript. No React, no Next.js, no Supabase dependencies.
 
 - `src/index.js` — `createValidator(options?)` factory. Discovers `form:not([data-a11y-ignore-form])` by default. Injects inline errors and an error summary. Manages `aria-invalid` / `aria-describedby` without clobbering existing refs. Also exposes `autoInit()`, `listForms()`, and remote config loading via `data-a11y-project`.
@@ -42,6 +43,7 @@ Framework-independent browser JavaScript. No React, no Next.js, no Supabase depe
 - Build produces ESM in `dist/` plus drop-in `dist/a11y-validator.js` (IIFE). Synced to `apps/web/public/validator/` on web predev/prebuild.
 
 ### `apps/web`
+
 Next.js 15 / React 19 / TypeScript dashboard. App Router only.
 
 - **`src/lib/supabase/`** — two Supabase clients: `client.ts` (browser, `createBrowserClient`) and `server.ts` (RSC/Route Handlers, `createServerClient` via `@supabase/ssr`). Always use the server client in Server Components and Route Handlers.
@@ -51,6 +53,7 @@ Next.js 15 / React 19 / TypeScript dashboard. App Router only.
 - **`src/styles/tokens.css`** — design tokens (BM Web Studio–inspired). All component styles reference these tokens.
 
 ### Supabase schema (`supabase/migrations/001_initial_schema.sql`)
+
 Key tables: `profiles`, `projects`, `project_settings`, `form_configs`, `scan_results`, `validation_events`.
 
 - `projects` has a `public_key` (`proj_` + 9 random hex bytes) used as the public API identifier.
@@ -63,10 +66,12 @@ Key tables: `profiles`, `projects`, `project_settings`, `form_configs`, `scan_re
 Copy `.env.example` to `.env.local` in `apps/web/`:
 
 ```
+
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=https://keystone-web-tmld.vercel.app/
+
 ```
 
 Apply the migration to your Supabase project before running.

@@ -28,7 +28,7 @@ Production deploys target **Vercel**. Link the repo, set the project root to `ap
 
 ```html
 <script
-  src="http://localhost:3000/validator/a11y-validator.js"
+  src="https://keystone-web-tmld.vercel.app/validator/a11y-validator.js"
   data-a11y-project="proj_your_public_key"
   defer
 ></script>

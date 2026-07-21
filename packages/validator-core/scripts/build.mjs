@@ -11,7 +11,7 @@ cpSync(src, dist, { recursive: true });
 
 function stripExports(source) {
   return source
-    .replace(/^import\s+.+?;\n?/gm, "")
+    .replace(/^import\s[\s\S]*?;\n?/gm, "")
     .replace(/export\s+async\s+function/g, "async function")
     .replace(/export\s+function/g, "function")
     .replace(/export\s+const/g, "const")
@@ -20,6 +20,10 @@ function stripExports(source) {
 }
 
 const rules = stripExports(readFileSync(join(src, "rules.js"), "utf8"));
+const fieldMessages = stripExports(
+  readFileSync(join(src, "field-messages.js"), "utf8"),
+);
+const styles = stripExports(readFileSync(join(src, "styles.js"), "utf8"));
 const scan = stripExports(readFileSync(join(src, "scan.js"), "utf8"));
 const index = stripExports(readFileSync(join(src, "index.js"), "utf8"))
   .replace(/const api = \{[\s\S]*?\};\n*/, "")
@@ -28,6 +32,8 @@ const index = stripExports(readFileSync(join(src, "index.js"), "utf8"))
 const bundle = `/*! Keystone — universal browser build */
 (function (global) {
 ${rules}
+${fieldMessages}
+${styles}
 ${scan}
 ${index}
   const api = {

@@ -40,7 +40,7 @@
 
 .form-error {
   margin: var(--space-4) 0 0;
-  color: var(--danger-700);
+  color: var(--danger-text);
   font-weight: 700;
 }
 
@@ -68,14 +68,16 @@
 .error-summary {
   margin-bottom: var(--space-6);
   padding: var(--space-5);
-  background: var(--danger-100);
-  border-left: 4px solid var(--danger-700);
+  background: var(--danger-surface);
+  border-left: 4px solid var(--danger-border);
   border-radius: var(--radius-sm);
+  color: var(--danger-text);
 }
 
 .error-summary h2 {
   margin: 0;
   font-size: var(--text-lg);
+  color: var(--danger-text);
 }
 
 .error-summary ul {
@@ -84,8 +86,13 @@
 }
 
 .error-summary a {
-  color: var(--danger-700);
+  color: var(--danger-text);
   font-weight: 700;
+}
+
+.error-summary a:focus-visible {
+  outline: 3px solid var(--danger-border-focus);
+  outline-offset: 2px;
 }
 
 .code-block {
