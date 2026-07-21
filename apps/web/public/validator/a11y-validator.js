@@ -599,6 +599,7 @@ async function fetchProjectConfig(projectKey, configUrl) {
 
   const response = await fetch(resolved, {
     headers: { Accept: "application/json" },
+    cache: "no-store",
   });
   if (!response.ok) {
     throw new Error(`Project configuration not found (${response.status})`);
@@ -770,7 +771,10 @@ async function autoInit(options = {}) {
     try {
       remote = await fetchProjectConfig(projectKey, configUrl);
     } catch (error) {
-      console.warn("[Keystone] Could not load project config:", error);
+      console.error(
+        "[Keystone] Could not load project config — using built-in defaults.",
+        error,
+      );
     }
   }
 

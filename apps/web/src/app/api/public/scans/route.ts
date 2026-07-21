@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { scanPublicCreateSchema } from "@/lib/validations/scan";
+import {
+  publicCorsHeaders,
+  publicOptionsResponse,
+} from "@/lib/api/public-cors";
+
+export async function OPTIONS() {
+  return publicOptionsResponse();
+}
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -14,7 +22,7 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.errors[0]?.message ?? "Invalid request." },
-      { status: 400 },
+      { status: 400, headers: publicCorsHeaders() },
     );
   }
 
@@ -68,5 +76,5 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json(data, { status: 201 });
+  return NextResponse.json(data, { status: 201, headers: publicCorsHeaders() });
 }
