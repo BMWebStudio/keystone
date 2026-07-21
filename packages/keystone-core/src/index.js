@@ -86,6 +86,47 @@ function show(field, text) {
   field.setAttribute("aria-describedby", [...refs].join(" "));
 }
 
+function fieldIsEmpty(field) {
+  if (field.type === "checkbox") return !field.checked;
+  if (field.type === "radio") {
+    return (
+      field.form?.querySelector(
+        `[name="${CSS.escape(field.name)}"]:checked`,
+      ) == null
+    );
+  }
+  return String(field.value ?? "").trim().length === 0;
+}
+
+function fieldIsDirty(field) {
+  return readDataset(field, "keystoneDirty", "a11yDirty") === "true";
+}
+
+function markFieldDirty(field) {
+  field.dataset.keystoneDirty = "true";
+}
+
+function formSubmitAttempted(form) {
+  return readDataset(form, "keystoneSubmitAttempted", "a11ySubmitAttempted") === "true";
+}
+
+function markSubmitAttempted(form) {
+  form.dataset.keystoneSubmitAttempted = "true";
+}
+
+/** Blur/change validation — skip untouched empty fields until submit. */
+function validateFieldInteractive(field, config, form) {
+  if (
+    !formSubmitAttempted(form) &&
+    fieldIsEmpty(field) &&
+    !fieldIsDirty(field)
+  ) {
+    clear(field);
+    return null;
+  }
+  return validateField(field, config);
+}
+
 function validateField(field, config) {
   clear(field);
   for (const rule of inferRules(field)) {
@@ -131,10 +172,11 @@ function summary(form, errors, config) {
 function normalizeMode(mode) {
   if (Array.isArray(mode)) return mode;
   if (typeof mode !== "string" || !mode.trim()) return defaults.validationMode;
-  if (mode === "submit") return ["submit"];
-  if (mode === "blur") return ["submit", "blur"];
-  if (mode === "change") return ["submit", "blur", "change"];
-  return mode.split(/[,\s]+/).filter(Boolean);
+  const value = mode.trim().toLowerCase();
+  if (value === "submit") return ["submit"];
+  if (value === "blur") return ["submit", "blur"];
+  if (value === "change") return ["submit", "blur", "change"];
+  return value.split(/[,\s]+/).filter(Boolean);
 }
 
 function mapRemoteConfig(data) {
@@ -184,6 +226,22 @@ function attachForm(form, config) {
 
   if (config.disableNativeValidation !== false) form.noValidate = true;
 
+  const interactive =
+    config.validationMode.includes("blur") ||
+    config.validationMode.includes("change");
+
+  if (interactive) {
+    form.addEventListener("input", (event) => {
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        target.matches("input,select,textarea")
+      ) {
+        markFieldDirty(target);
+      }
+    });
+  }
+
   if (config.validationMode.includes("blur")) {
     form.addEventListener("focusout", (event) => {
       const target = event.target;
@@ -191,7 +249,7 @@ function attachForm(form, config) {
         target instanceof HTMLElement &&
         target.matches("input,select,textarea")
       ) {
-        validateField(target, config);
+        validateFieldInteractive(target, config, form);
       }
     });
   }
@@ -203,12 +261,14 @@ function attachForm(form, config) {
         target instanceof HTMLElement &&
         target.matches("input,select,textarea")
       ) {
-        validateField(target, config);
+        markFieldDirty(target);
+        validateFieldInteractive(target, config, form);
       }
     });
   }
 
   form.addEventListener("submit", (event) => {
+    markSubmitAttempted(form);
     const errors = fields(form)
       .map((field) => ({ field, text: validateField(field, config) }))
       .filter((item) => item.text);
@@ -275,7 +335,9 @@ export function createValidator(options = {}) {
     ...defaults,
     ...options,
     validationMode: normalizeMode(
-      options.validationMode ?? defaults.validationMode,
+      options.validationMode ??
+        options.validation_mode ??
+        defaults.validationMode,
     ),
     messages: { ...defaults.messages, ...options.messages },
     fieldMessages: {

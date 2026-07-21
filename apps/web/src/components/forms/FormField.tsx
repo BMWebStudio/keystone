@@ -8,6 +8,7 @@ import styles from "./FormField.module.css";
 
 type ChildProps = {
   id?: string;
+  required?: boolean;
   "aria-invalid"?: boolean;
   "aria-describedby"?: string;
 };
@@ -34,6 +35,7 @@ export function FormField({
   const control = isValidElement(children)
     ? cloneElement(children as ReactElement<ChildProps>, {
         id,
+        required: required || undefined,
         "aria-invalid": Boolean(error),
         "aria-describedby": describedBy,
       })

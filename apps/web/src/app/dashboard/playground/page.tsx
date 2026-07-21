@@ -14,7 +14,7 @@ export default async function PlaygroundPage() {
 
   const { data: projects, error } = await supabase
     .from("projects")
-    .select("id,name")
+    .select("id,name,public_key")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 

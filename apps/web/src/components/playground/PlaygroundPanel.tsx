@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
-import { createValidator } from "@keystone/core";
+import { useEffect, useRef, useState } from "react";
+import { createValidator, fetchProjectConfig } from "@keystone/core";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -20,6 +20,7 @@ import styles from "@/app/dashboard/playground/playground.module.css";
 type ProjectOption = {
   id: string;
   name: string;
+  public_key: string;
 };
 
 function issueSeverity(
@@ -37,13 +38,38 @@ function issueSeverity(
   return "warning";
 }
 
+function resetPlaygroundForm(root: HTMLElement) {
+  const form = root.querySelector("form");
+  if (!form) return;
+
+  delete form.dataset.keystoneBound;
+  delete form.dataset.keystoneSubmitAttempted;
+  form.querySelectorAll("input,select,textarea").forEach((field) => {
+    delete (field as HTMLElement).dataset.keystoneDirty;
+    field.removeAttribute("aria-invalid");
+    field.classList.remove("keystone-field-invalid", "a11y-field-invalid");
+  });
+  root
+    .querySelectorAll(".keystone-field-error, .a11y-field-error")
+    .forEach((el) => el.remove());
+  root
+    .querySelector("[data-keystone-error-summary], [data-a11y-error-summary]")
+    ?.remove();
+}
+
+function formatValidationMode(modes: string[]) {
+  if (modes.includes("change")) return "Change + submit";
+  if (modes.includes("blur")) return "Blur + submit";
+  return "Submit only";
+}
+
 export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
   const router = useRouter();
   const playgroundRef = useRef<HTMLDivElement>(null);
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedProjectId, setSelectedProjectId] = useState(
     projects[0]?.id ?? "",
   );
+  const [validationModeLabel, setValidationModeLabel] = useState("Submit only");
   const [scanPayload, setScanPayload] = useState<ScanPayload | null>(null);
   const [scanIssues, setScanIssues] = useState<ScanIssue[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
@@ -51,22 +77,42 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
   const [isScanning, setIsScanning] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const submit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const next: Record<string, string> = {};
-    if (!data.get("name")) next.name = "Enter your name.";
-    const email = String(data.get("email") || "");
-    if (!email) next.email = "Enter your email address.";
-    else if (!/^\S+@\S+\.\S+$/.test(email))
-      next.email = "Enter an email address in the format name@example.com.";
-    setErrors(next);
-    if (Object.keys(next).length) {
-      requestAnimationFrame(() =>
-        document.getElementById("playground-summary")?.focus(),
+  useEffect(() => {
+    let cancelled = false;
+    const root = playgroundRef.current;
+    if (!root) return;
+
+    async function initValidator() {
+      if (!root) return;
+
+      resetPlaygroundForm(root);
+
+      const project = projects.find((item) => item.id === selectedProjectId);
+      let remote = {};
+
+      if (project?.public_key) {
+        try {
+          remote = await fetchProjectConfig(project.public_key);
+        } catch {
+          // Use built-in defaults when config cannot be loaded.
+        }
+      }
+
+      if (cancelled) return;
+
+      const validator = createValidator(remote);
+      validator.init(root);
+      setValidationModeLabel(
+        formatValidationMode(validator.config.validationMode),
       );
     }
-  };
+
+    void initValidator();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [projects, selectedProjectId]);
 
   const runScan = () => {
     setFormError(null);
@@ -138,7 +184,7 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
       <PageHeader
         eyebrow="Interactive lab"
         title="Form validation playground"
-        description="Run markup scans against the sample form, then save results to a project for the dashboard and scans history."
+        description="Test live validation using the selected project's settings, run markup scans, and save results to the dashboard."
         actions={
           <Link className={styles["header-link"]} href="/dashboard/scans">
             View scans
@@ -148,7 +194,7 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
 
       <Card className={styles["scan-controls"]}>
         <CardHeader
-          title="Save scan to project"
+          title="Project + scan controls"
           meta={
             scanPayload ? (
               <Badge tone={scanPayload.error_count ? "danger" : "success"}>
@@ -165,7 +211,7 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
             <FormField
               id="scan-project"
               label="Project"
-              description="Saved scans appear on the overview and scans pages for this project."
+              description="Validation mode, messages, and error colors come from this project's settings."
             >
               <select
                 id="scan-project"
@@ -200,6 +246,11 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
               </Button>
             </div>
           </div>
+          {projects.length > 0 && (
+            <p className={styles["inline-note"]}>
+              Active validation mode: <strong>{validationModeLabel}</strong>
+            </p>
+          )}
           {!projects.length && (
             <p className={styles["inline-note"]}>
               <Link href="/dashboard/projects">Create a project</Link> before
@@ -225,38 +276,12 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
           <CardHeader title="Example contact form" />
           <CardContent>
             <div ref={playgroundRef}>
-              {Object.keys(errors).length > 0 && (
-                <div
-                  id="playground-summary"
-                  tabIndex={-1}
-                  className={styles["error-summary"]}
-                  role="alert"
-                  aria-labelledby="summary-heading"
-                >
-                  <h2 id="summary-heading">
-                    There are {Object.keys(errors).length} errors
-                  </h2>
-                  <ul>
-                    {Object.entries(errors).map(([id, msg]) => (
-                      <li key={id}>
-                        <a href={`#${id}`}>{msg}</a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
               <form
-                onSubmit={submit}
                 noValidate
                 className={styles["playground-form"]}
                 data-keystone-form-id="playground-contact"
               >
-                <FormField
-                  id="name"
-                  label="Name"
-                  required
-                  error={errors.name}
-                >
+                <FormField id="name" label="Name" required>
                   <input id="name" name="name" autoComplete="name" />
                 </FormField>
                 <FormField
@@ -264,7 +289,6 @@ export function PlaygroundPanel({ projects }: { projects: ProjectOption[] }) {
                   label="Email address"
                   description="We will only use this to respond to your message."
                   required
-                  error={errors.email}
                 >
                   <input
                     id="email"
