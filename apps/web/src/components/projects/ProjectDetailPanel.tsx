@@ -306,130 +306,6 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
         </div>
 
         <Card>
-          <CardHeader title="Error field colors" />
-          <CardContent>
-            <p className={styles["message-fieldset-note"]}>
-              Customize the background colors applied to invalid fields on your
-              site. Both colors are checked against the validator field text
-              color (<code>{ERROR_FIELD_TEXT_COLOR}</code>) and must meet or
-              exceed WCAG AA contrast of {WCAG_AA_CONTRAST_MIN}:1. Border,
-              message text, and summary colors stay on the accessible default
-              palette.
-            </p>
-            <div className={styles["color-fields"]}>
-              <div className={formFieldStyles["form-field"]}>
-                <label htmlFor="error-field-background">
-                  Invalid field background
-                </label>
-                <div className={styles["color-input-row"]}>
-                  <input
-                    type="color"
-                    className={styles["color-picker"]}
-                    value={errorColors.field_background}
-                    onChange={(event) =>
-                      setErrorColors((current) =>
-                        applyBackgroundColorChange(current, event.target.value),
-                      )
-                    }
-                    aria-label="Invalid field background color"
-                  />
-                  <input
-                    id="error-field-background"
-                    name="errorFieldBackground"
-                    value={errorColors.field_background}
-                    onChange={(event) =>
-                      setErrorColors((current) =>
-                        applyBackgroundColorChange(current, event.target.value),
-                      )
-                    }
-                    placeholder={DEFAULT_ERROR_FIELD_COLORS.field_background}
-                  />
-                </div>
-                <ContrastStatus background={errorColors.field_background} />
-              </div>
-              <div className={formFieldStyles["form-field"]}>
-                <label htmlFor="error-field-background-focus">
-                  Invalid field focus background
-                </label>
-                <div className={styles["color-input-row"]}>
-                  <input
-                    type="color"
-                    className={styles["color-picker"]}
-                    value={errorColors.field_background_focus}
-                    onChange={(event) =>
-                      setErrorColors((current) => ({
-                        ...current,
-                        field_background_focus: event.target.value,
-                      }))
-                    }
-                    aria-label="Invalid field focus background color"
-                  />
-                  <input
-                    id="error-field-background-focus"
-                    name="errorFieldBackgroundFocus"
-                    value={errorColors.field_background_focus}
-                    onChange={(event) =>
-                      setErrorColors((current) => ({
-                        ...current,
-                        field_background_focus: event.target.value,
-                      }))
-                    }
-                    placeholder={
-                      DEFAULT_ERROR_FIELD_COLORS.field_background_focus
-                    }
-                  />
-                </div>
-                <ContrastStatus background={errorColors.field_background_focus} />
-                <p className={styles["color-sync-note"]}>
-                  Focus background updates automatically when you change the
-                  base background so it stays distinguishable and meets contrast.
-                  You can still override it manually.
-                </p>
-              </div>
-            </div>
-            <div className={styles["color-preview"]}>
-              <p className={styles["color-preview-label"]}>Preview</p>
-              <input
-                className={styles["color-preview-field"]}
-                aria-invalid="true"
-                readOnly
-                value="Invalid field example"
-                style={{
-                  backgroundColor: errorColors.field_background,
-                  borderColor: "var(--danger-border)",
-                  boxShadow: "0 0 0 1px var(--danger-border)",
-                  color: ERROR_FIELD_TEXT_COLOR,
-                }}
-              />
-              <input
-                className={`${styles["color-preview-field"]} ${styles["color-preview-field-focus"]}`}
-                aria-invalid="true"
-                readOnly
-                value="Invalid field focus example"
-                style={{
-                  backgroundColor: errorColors.field_background_focus,
-                  borderColor: "var(--danger-border-focus)",
-                  boxShadow: "0 0 0 1px var(--danger-border-focus)",
-                  outline: "3px solid var(--danger-border-focus)",
-                  outlineOffset: "2px",
-                  color: ERROR_FIELD_TEXT_COLOR,
-                }}
-              />
-              <Button
-                type="button"
-                size="sm"
-                variant="secondary"
-                onClick={() =>
-                  setErrorColors(mergeErrorFieldColors(DEFAULT_ERROR_FIELD_COLORS))
-                }
-              >
-                Reset to defaults
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
           <CardHeader title="Validation messages" />
           <CardContent>
             <p className={styles["message-fieldset-note"]}>
@@ -458,6 +334,142 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                   />
                 </FormField>
               ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader title="Error field colors" />
+          <CardContent>
+            <p className={styles["message-fieldset-note"]}>
+              Customize the background colors applied to invalid fields on your
+              site. Both colors are checked against the validator field text
+              color (<code>{ERROR_FIELD_TEXT_COLOR}</code>) and must meet or
+              exceed WCAG AA contrast of {WCAG_AA_CONTRAST_MIN}:1. Border,
+              message text, and summary colors stay on the accessible default
+              palette.
+            </p>
+            <div className={styles["color-settings-layout"]}>
+              <div className={styles["color-controls"]}>
+                <div className={formFieldStyles["form-field"]}>
+                  <label htmlFor="error-field-background">
+                    Invalid field background
+                  </label>
+                  <div className={styles["color-input-row"]}>
+                    <input
+                      type="color"
+                      className={styles["color-picker"]}
+                      value={errorColors.field_background}
+                      onChange={(event) =>
+                        setErrorColors((current) =>
+                          applyBackgroundColorChange(
+                            current,
+                            event.target.value,
+                          ),
+                        )
+                      }
+                      aria-label="Invalid field background color"
+                    />
+                    <input
+                      id="error-field-background"
+                      name="errorFieldBackground"
+                      value={errorColors.field_background}
+                      onChange={(event) =>
+                        setErrorColors((current) =>
+                          applyBackgroundColorChange(
+                            current,
+                            event.target.value,
+                          ),
+                        )
+                      }
+                      placeholder={DEFAULT_ERROR_FIELD_COLORS.field_background}
+                    />
+                  </div>
+                  <ContrastStatus background={errorColors.field_background} />
+                </div>
+                <div className={formFieldStyles["form-field"]}>
+                  <label htmlFor="error-field-background-focus">
+                    Invalid field focus background
+                  </label>
+                  <div className={styles["color-input-row"]}>
+                    <input
+                      type="color"
+                      className={styles["color-picker"]}
+                      value={errorColors.field_background_focus}
+                      onChange={(event) =>
+                        setErrorColors((current) => ({
+                          ...current,
+                          field_background_focus: event.target.value,
+                        }))
+                      }
+                      aria-label="Invalid field focus background color"
+                    />
+                    <input
+                      id="error-field-background-focus"
+                      name="errorFieldBackgroundFocus"
+                      value={errorColors.field_background_focus}
+                      onChange={(event) =>
+                        setErrorColors((current) => ({
+                          ...current,
+                          field_background_focus: event.target.value,
+                        }))
+                      }
+                      placeholder={
+                        DEFAULT_ERROR_FIELD_COLORS.field_background_focus
+                      }
+                    />
+                  </div>
+                  <ContrastStatus
+                    background={errorColors.field_background_focus}
+                  />
+                  <p className={styles["color-sync-note"]}>
+                    Focus background updates automatically when you change the
+                    base background so it stays distinguishable and meets
+                    contrast. You can still override it manually.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  onClick={() =>
+                    setErrorColors(
+                      mergeErrorFieldColors(DEFAULT_ERROR_FIELD_COLORS),
+                    )
+                  }
+                >
+                  Reset to defaults
+                </Button>
+              </div>
+              <div className={styles["color-preview"]}>
+                <p className={styles["color-preview-label"]}>Preview</p>
+                <input
+                  className={styles["color-preview-field"]}
+                  aria-invalid="true"
+                  readOnly
+                  value="Invalid field example"
+                  style={{
+                    backgroundColor: errorColors.field_background,
+                    borderColor: "var(--danger-border)",
+                    boxShadow: "0 0 0 1px var(--danger-border)",
+                    color: ERROR_FIELD_TEXT_COLOR,
+                  }}
+                />
+                <input
+                  className={`${styles["color-preview-field"]} ${styles["color-preview-field-focus"]}`}
+                  aria-invalid="true"
+                  readOnly
+                  value="Invalid field focus example"
+                  style={{
+                    backgroundColor: errorColors.field_background_focus,
+                    borderColor: "var(--danger-border-focus)",
+                    boxShadow: "0 0 0 1px var(--danger-border-focus)",
+                    outline: "3px solid var(--danger-border-focus)",
+                    outlineOffset: "2px",
+                    color: ERROR_FIELD_TEXT_COLOR,
+                  }}
+                />
+              </div>
             </div>
           </CardContent>
         </Card>

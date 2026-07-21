@@ -59,11 +59,17 @@
   gap: var(--space-5);
 }
 
-.color-fields {
+.color-settings-layout {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.color-controls {
+  display: grid;
   gap: var(--space-5);
-  margin-bottom: var(--space-5);
+  align-content: start;
 }
 
 .color-input-row {
@@ -100,7 +106,6 @@
 
 .color-preview-field {
   width: 100%;
-  max-width: 20rem;
   padding: var(--space-3);
   border: 1px solid var(--danger-border);
   border-radius: var(--radius-sm);
@@ -135,7 +140,7 @@
 
 @media (max-width: 720px) {
   .message-fields,
-  .color-fields {
+  .color-settings-layout {
     grid-template-columns: 1fr;
   }
 }
