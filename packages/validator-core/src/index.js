@@ -127,6 +127,7 @@ function mapRemoteConfig(data) {
       data.disableNativeValidation ??
       defaults.disableNativeValidation,
     messages: data.messages || {},
+    errorColors: data.error_colors ?? data.errorColors ?? {},
   };
 }
 
@@ -256,13 +257,14 @@ export function createValidator(options = {}) {
       ...defaultFieldMessages,
       ...options.fieldMessages,
     },
+    errorColors: options.errorColors ?? {},
   };
 
   return {
     config,
     /** Discover forms and attach validation listeners */
     init(root = document) {
-      injectDefaultStyles();
+      injectDefaultStyles(config.errorColors);
       const scope = root.querySelectorAll ? root : document;
       scope.querySelectorAll(config.selector).forEach((form) => {
         attachForm(form, config);

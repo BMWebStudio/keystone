@@ -19,6 +19,9 @@ join public.project_settings s on s.project_id = p.id;
 
 grant select on public.public_project_configs to anon, authenticated;
 
+-- NOTE: security_invoker = false bypasses RLS (Supabase linter warning).
+-- Fixed in 005_public_config_rls.sql with anon policies + security_invoker = on.
+
 -- Allow the hosted validator to record anonymized validation events.
 create policy "events insert for active public projects"
 on public.validation_events

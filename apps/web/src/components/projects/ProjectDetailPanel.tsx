@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { FormField } from "@/components/forms/FormField";
+import formFieldStyles from "@/components/forms/FormField.module.css";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
@@ -15,12 +16,27 @@ import {
   VALIDATION_MESSAGE_LABELS,
   type ValidationMessages,
 } from "@/lib/validations/messages";
+import {
+  applyBackgroundColorChange,
+  DEFAULT_ERROR_FIELD_COLORS,
+  ERROR_FIELD_TEXT_COLOR,
+  mergeErrorFieldColors,
+  serializeErrorFieldColors,
+  validateErrorFieldContrast,
+  WCAG_AA_CONTRAST_MIN,
+  type ErrorFieldColors,
+} from "@/lib/validations/error-colors";
+import {
+  evaluateContrast,
+  formatContrastRatio,
+} from "@/lib/a11y/contrast";
 
 type ProjectSettings = {
   validation_mode: string;
   show_error_summary: boolean;
   disable_native_validation: boolean;
   messages?: ValidationMessages | null;
+  error_colors?: Partial<ErrorFieldColors> | null;
 };
 
 export type ProjectDetailData = {
@@ -52,6 +68,25 @@ function getSettings(
   );
 }
 
+function ContrastStatus({ background }: { background: string }) {
+  const result = evaluateContrast(ERROR_FIELD_TEXT_COLOR, background);
+  if (!result) return null;
+
+  return (
+    <p
+      className={
+        result.passes ? styles["contrast-pass"] : styles["contrast-fail"]
+      }
+      role="status"
+    >
+      {formatContrastRatio(result.ratio)} —{" "}
+      {result.passes
+        ? `Passes WCAG AA (${WCAG_AA_CONTRAST_MIN}:1 minimum)`
+        : `Below WCAG AA ${WCAG_AA_CONTRAST_MIN}:1 minimum`}
+    </p>
+  );
+}
+
 export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) {
   const router = useRouter();
   const settings = getSettings(project.project_settings);
@@ -76,6 +111,9 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
   const [messages, setMessages] = useState(() =>
     mergeValidationMessages(settings.messages),
   );
+  const [errorColors, setErrorColors] = useState(() =>
+    mergeErrorFieldColors(settings.error_colors),
+  );
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
@@ -94,6 +132,12 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
       return;
     }
 
+    const contrastError = validateErrorFieldContrast(errorColors);
+    if (contrastError) {
+      setFormError(contrastError);
+      return;
+    }
+
     setIsSaving(true);
 
     const response = await fetch(`/api/projects/${project.id}`, {
@@ -106,6 +150,7 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
         show_error_summary: showErrorSummary === "enabled",
         disable_native_validation: disableNativeValidation === "disabled",
         messages,
+        error_colors: serializeErrorFieldColors(errorColors),
       }),
     });
 
@@ -259,6 +304,130 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader title="Error field colors" />
+          <CardContent>
+            <p className={styles["message-fieldset-note"]}>
+              Customize the background colors applied to invalid fields on your
+              site. Both colors are checked against the validator field text
+              color (<code>{ERROR_FIELD_TEXT_COLOR}</code>) and must meet or
+              exceed WCAG AA contrast of {WCAG_AA_CONTRAST_MIN}:1. Border,
+              message text, and summary colors stay on the accessible default
+              palette.
+            </p>
+            <div className={styles["color-fields"]}>
+              <div className={formFieldStyles["form-field"]}>
+                <label htmlFor="error-field-background">
+                  Invalid field background
+                </label>
+                <div className={styles["color-input-row"]}>
+                  <input
+                    type="color"
+                    className={styles["color-picker"]}
+                    value={errorColors.field_background}
+                    onChange={(event) =>
+                      setErrorColors((current) =>
+                        applyBackgroundColorChange(current, event.target.value),
+                      )
+                    }
+                    aria-label="Invalid field background color"
+                  />
+                  <input
+                    id="error-field-background"
+                    name="errorFieldBackground"
+                    value={errorColors.field_background}
+                    onChange={(event) =>
+                      setErrorColors((current) =>
+                        applyBackgroundColorChange(current, event.target.value),
+                      )
+                    }
+                    placeholder={DEFAULT_ERROR_FIELD_COLORS.field_background}
+                  />
+                </div>
+                <ContrastStatus background={errorColors.field_background} />
+              </div>
+              <div className={formFieldStyles["form-field"]}>
+                <label htmlFor="error-field-background-focus">
+                  Invalid field focus background
+                </label>
+                <div className={styles["color-input-row"]}>
+                  <input
+                    type="color"
+                    className={styles["color-picker"]}
+                    value={errorColors.field_background_focus}
+                    onChange={(event) =>
+                      setErrorColors((current) => ({
+                        ...current,
+                        field_background_focus: event.target.value,
+                      }))
+                    }
+                    aria-label="Invalid field focus background color"
+                  />
+                  <input
+                    id="error-field-background-focus"
+                    name="errorFieldBackgroundFocus"
+                    value={errorColors.field_background_focus}
+                    onChange={(event) =>
+                      setErrorColors((current) => ({
+                        ...current,
+                        field_background_focus: event.target.value,
+                      }))
+                    }
+                    placeholder={
+                      DEFAULT_ERROR_FIELD_COLORS.field_background_focus
+                    }
+                  />
+                </div>
+                <ContrastStatus background={errorColors.field_background_focus} />
+                <p className={styles["color-sync-note"]}>
+                  Focus background updates automatically when you change the
+                  base background so it stays distinguishable and meets contrast.
+                  You can still override it manually.
+                </p>
+              </div>
+            </div>
+            <div className={styles["color-preview"]}>
+              <p className={styles["color-preview-label"]}>Preview</p>
+              <input
+                className={styles["color-preview-field"]}
+                aria-invalid="true"
+                readOnly
+                value="Invalid field example"
+                style={{
+                  backgroundColor: errorColors.field_background,
+                  borderColor: "var(--danger-border)",
+                  boxShadow: "0 0 0 1px var(--danger-border)",
+                  color: ERROR_FIELD_TEXT_COLOR,
+                }}
+              />
+              <input
+                className={`${styles["color-preview-field"]} ${styles["color-preview-field-focus"]}`}
+                aria-invalid="true"
+                readOnly
+                value="Invalid field focus example"
+                style={{
+                  backgroundColor: errorColors.field_background_focus,
+                  borderColor: "var(--danger-border-focus)",
+                  boxShadow: "0 0 0 1px var(--danger-border-focus)",
+                  outline: "3px solid var(--danger-border-focus)",
+                  outlineOffset: "2px",
+                  color: ERROR_FIELD_TEXT_COLOR,
+                }}
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                onClick={() =>
+                  setErrorColors(mergeErrorFieldColors(DEFAULT_ERROR_FIELD_COLORS))
+                }
+              >
+                Reset to defaults
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader title="Validation messages" />

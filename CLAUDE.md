@@ -57,7 +57,7 @@ Next.js 15 / React 19 / TypeScript dashboard. App Router only.
 Key tables: `profiles`, `projects`, `project_settings`, `form_configs`, `scan_results`, `validation_events`.
 
 - `projects` has a `public_key` (`proj_` + 9 random hex bytes) used as the public API identifier.
-- `public_project_configs` is a view joining `projects` + `project_settings` — this is what the public Route Handler queries.
+- `public_project_configs` is a view joining `projects` + `project_settings` — this is what the public Route Handler queries. Uses `security_invoker = on` with anon RLS policies (migration `005_public_config_rls.sql`) so active project config is readable without bypassing RLS.
 - All tables have RLS. `validation_events` is insert-only from clients (select only for owner).
 - `handle_new_user` trigger auto-creates a `profiles` row on `auth.users` insert.
 

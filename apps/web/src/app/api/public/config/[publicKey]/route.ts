@@ -18,7 +18,7 @@ export async function GET(
   const { data, error } = await supabase
     .from("public_project_configs")
     .select(
-      "validation_mode,show_error_summary,focus_error_summary,disable_native_validation,messages",
+      "validation_mode,show_error_summary,focus_error_summary,disable_native_validation,messages,error_colors",
     )
     .eq("public_key", publicKey)
     .eq("is_active", true)

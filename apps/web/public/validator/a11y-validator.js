@@ -228,11 +228,37 @@ const errorStyleTokens = {
   summaryBorder: "#8a2329",
 };
 
-function injectDefaultStyles() {
-  if (typeof document === "undefined") return;
-  if (document.getElementById(STYLE_ID)) return;
+function normalizeColor(value) {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/.test(trimmed) ? trimmed : null;
+}
 
-  const t = errorStyleTokens;
+function resolveErrorStyleTokens(overrides = {}) {
+  const fieldBackground =
+    normalizeColor(overrides.fieldBackground) ??
+    normalizeColor(overrides.field_background) ??
+    errorStyleTokens.surface;
+  const fieldBackgroundFocus =
+    normalizeColor(overrides.fieldBackgroundFocus) ??
+    normalizeColor(overrides.field_background_focus) ??
+    errorStyleTokens.surfaceFocus;
+
+  return {
+    ...errorStyleTokens,
+    surface: fieldBackground,
+    surfaceFocus: fieldBackgroundFocus,
+    summarySurface: fieldBackground,
+  };
+}
+
+function injectDefaultStyles(overrides = {}) {
+  if (typeof document === "undefined") return;
+
+  const existing = document.getElementById(STYLE_ID);
+  if (existing) existing.remove();
+
+  const t = resolveErrorStyleTokens(overrides);
   const style = document.createElement("style");
   style.id = STYLE_ID;
   style.textContent = `
@@ -580,6 +606,7 @@ function mapRemoteConfig(data) {
       data.disableNativeValidation ??
       defaults.disableNativeValidation,
     messages: data.messages || {},
+    errorColors: data.error_colors ?? data.errorColors ?? {},
   };
 }
 
@@ -709,13 +736,14 @@ function createValidator(options = {}) {
       ...defaultFieldMessages,
       ...options.fieldMessages,
     },
+    errorColors: options.errorColors ?? {},
   };
 
   return {
     config,
     /** Discover forms and attach validation listeners */
     init(root = document) {
-      injectDefaultStyles();
+      injectDefaultStyles(config.errorColors);
       const scope = root.querySelectorAll ? root : document;
       scope.querySelectorAll(config.selector).forEach((form) => {
         attachForm(form, config);
