@@ -24,11 +24,16 @@ export function resolveErrorStyleTokens(overrides = {}) {
     normalizeColor(overrides.fieldBackgroundFocus) ??
     normalizeColor(overrides.field_background_focus) ??
     errorStyleTokens.surfaceFocus;
+  const fieldText =
+    normalizeColor(overrides.fieldText) ??
+    normalizeColor(overrides.field_text) ??
+    "#20201d";
 
   return {
     ...errorStyleTokens,
     surface: fieldBackground,
     surfaceFocus: fieldBackgroundFocus,
+    fieldText,
   };
 }
 
@@ -53,7 +58,7 @@ select[aria-invalid="true"],
 textarea[aria-invalid="true"] {
   background-color: ${t.surface};
   border-color: ${t.border};
-  color: #20201d;
+  color: ${t.fieldText};
   box-shadow: 0 0 0 1px ${t.border};
 }
 

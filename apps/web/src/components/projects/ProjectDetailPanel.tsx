@@ -21,8 +21,10 @@ import {
 import {
   applyBackgroundColorChange,
   DEFAULT_ERROR_FIELD_COLORS,
-  ERROR_FIELD_TEXT_COLOR,
+  getRecommendedFieldTextColor,
+  isCustomFieldTextColor,
   mergeErrorFieldColors,
+  resolveFieldTextColor,
   serializeErrorFieldColors,
   validateErrorFieldContrast,
   WCAG_AA_CONTRAST_MIN,
@@ -71,8 +73,14 @@ function getSettings(
   );
 }
 
-function ContrastStatus({ background }: { background: string }) {
-  const result = evaluateContrast(ERROR_FIELD_TEXT_COLOR, background);
+function ContrastStatus({
+  foreground,
+  background,
+}: {
+  foreground: string;
+  background: string;
+}) {
+  const result = evaluateContrast(foreground, background);
   if (!result) return null;
 
   return (
@@ -116,6 +124,9 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
   const [errorColors, setErrorColors] = useState(() =>
     mergeErrorFieldColors(settings.error_colors),
   );
+  const [textColorCustomized, setTextColorCustomized] = useState(() =>
+    isCustomFieldTextColor(mergeErrorFieldColors(settings.error_colors)),
+  );
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
@@ -133,6 +144,9 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
     );
     setMessages(mergeValidationMessages(nextSettings.messages));
     setErrorColors(mergeErrorFieldColors(nextSettings.error_colors));
+    setTextColorCustomized(
+      isCustomFieldTextColor(mergeErrorFieldColors(nextSettings.error_colors)),
+    );
   }, [project]);
 
   async function handleSave(event: FormEvent<HTMLFormElement>) {
@@ -208,6 +222,54 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
     } catch {
       setCopyMessage("Could not copy snippet.");
     }
+  }
+
+  const recommendedTextColor = getRecommendedFieldTextColor(errorColors);
+  const previewTextColor = resolveFieldTextColor(errorColors);
+
+  function handleErrorBackgroundChange(nextBackground: string) {
+    setErrorColors((current) =>
+      applyBackgroundColorChange(current, nextBackground, {
+        syncFocus: true,
+        syncText: !textColorCustomized,
+      }),
+    );
+  }
+
+  function handleErrorFocusBackgroundChange(nextFocusBackground: string) {
+    setErrorColors((current) => ({
+      ...current,
+      field_background_focus: nextFocusBackground,
+      ...(textColorCustomized
+        ? {}
+        : {
+            field_text: getRecommendedFieldTextColor({
+              field_background: current.field_background,
+              field_background_focus: nextFocusBackground,
+            }),
+          }),
+    }));
+  }
+
+  function handleErrorTextColorChange(nextTextColor: string) {
+    setTextColorCustomized(true);
+    setErrorColors((current) => ({
+      ...current,
+      field_text: nextTextColor,
+    }));
+  }
+
+  function applyRecommendedTextColor() {
+    setTextColorCustomized(false);
+    setErrorColors((current) => ({
+      ...current,
+      field_text: getRecommendedFieldTextColor(current),
+    }));
+  }
+
+  function resetErrorColors() {
+    setTextColorCustomized(false);
+    setErrorColors(mergeErrorFieldColors(null));
   }
 
   return (
@@ -360,12 +422,11 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
           <CardHeader title="Error field colors" />
           <CardContent>
             <p className={styles["message-fieldset-note"]}>
-              Customize the background colors applied to invalid fields on your
-              site. Both colors are checked against the validator field text
-              color (<code>{ERROR_FIELD_TEXT_COLOR}</code>) and must meet or
-              exceed WCAG AA contrast of {WCAG_AA_CONTRAST_MIN}:1. Border,
-              message text, and summary colors stay on the accessible default
-              palette.
+              Customize the background and text colors applied to invalid fields
+              on your site. When you change a background, Keystone recommends a
+              text color that meets WCAG AA contrast of {WCAG_AA_CONTRAST_MIN}:1
+              against both backgrounds. You can override the text color to
+              preview a custom choice before saving.
             </p>
             <div className={styles["color-settings-layout"]}>
               <div className={styles["color-controls"]}>
@@ -379,12 +440,7 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                       className={styles["color-picker"]}
                       value={errorColors.field_background}
                       onChange={(event) =>
-                        setErrorColors((current) =>
-                          applyBackgroundColorChange(
-                            current,
-                            event.target.value,
-                          ),
-                        )
+                        handleErrorBackgroundChange(event.target.value)
                       }
                       aria-label="Invalid field background color"
                     />
@@ -393,17 +449,15 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                       name="errorFieldBackground"
                       value={errorColors.field_background}
                       onChange={(event) =>
-                        setErrorColors((current) =>
-                          applyBackgroundColorChange(
-                            current,
-                            event.target.value,
-                          ),
-                        )
+                        handleErrorBackgroundChange(event.target.value)
                       }
                       placeholder={DEFAULT_ERROR_FIELD_COLORS.field_background}
                     />
                   </div>
-                  <ContrastStatus background={errorColors.field_background} />
+                  <ContrastStatus
+                    foreground={previewTextColor}
+                    background={errorColors.field_background}
+                  />
                 </div>
                 <div className={formFieldStyles["form-field"]}>
                   <label htmlFor="error-field-background-focus">
@@ -415,10 +469,7 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                       className={styles["color-picker"]}
                       value={errorColors.field_background_focus}
                       onChange={(event) =>
-                        setErrorColors((current) => ({
-                          ...current,
-                          field_background_focus: event.target.value,
-                        }))
+                        handleErrorFocusBackgroundChange(event.target.value)
                       }
                       aria-label="Invalid field focus background color"
                     />
@@ -427,10 +478,7 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                       name="errorFieldBackgroundFocus"
                       value={errorColors.field_background_focus}
                       onChange={(event) =>
-                        setErrorColors((current) => ({
-                          ...current,
-                          field_background_focus: event.target.value,
-                        }))
+                        handleErrorFocusBackgroundChange(event.target.value)
                       }
                       placeholder={
                         DEFAULT_ERROR_FIELD_COLORS.field_background_focus
@@ -438,6 +486,7 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                     />
                   </div>
                   <ContrastStatus
+                    foreground={previewTextColor}
                     background={errorColors.field_background_focus}
                   />
                   <p className={styles["color-sync-note"]}>
@@ -446,15 +495,50 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                     contrast. You can still override it manually.
                   </p>
                 </div>
+                <div className={formFieldStyles["form-field"]}>
+                  <label htmlFor="error-field-text">
+                    Invalid field text color
+                  </label>
+                  <p className={styles["color-sync-note"]}>
+                    Recommended: <code>{recommendedTextColor}</code>
+                    {textColorCustomized ? " (custom override)" : ""}
+                  </p>
+                  <div className={styles["color-input-row"]}>
+                    <input
+                      type="color"
+                      className={styles["color-picker"]}
+                      value={previewTextColor}
+                      onChange={(event) =>
+                        handleErrorTextColorChange(event.target.value)
+                      }
+                      aria-label="Invalid field text color"
+                    />
+                    <input
+                      id="error-field-text"
+                      name="errorFieldText"
+                      value={previewTextColor}
+                      onChange={(event) =>
+                        handleErrorTextColorChange(event.target.value)
+                      }
+                      placeholder={recommendedTextColor}
+                    />
+                  </div>
+                  {textColorCustomized ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      onClick={applyRecommendedTextColor}
+                    >
+                      Use recommended color
+                    </Button>
+                  ) : null}
+                </div>
                 <Button
                   type="button"
                   size="sm"
                   variant="secondary"
-                  onClick={() =>
-                    setErrorColors(
-                      mergeErrorFieldColors(DEFAULT_ERROR_FIELD_COLORS),
-                    )
-                  }
+                  onClick={resetErrorColors}
                 >
                   Reset to defaults
                 </Button>
@@ -470,7 +554,7 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                     backgroundColor: errorColors.field_background,
                     borderColor: "var(--danger-border)",
                     boxShadow: "0 0 0 1px var(--danger-border)",
-                    color: ERROR_FIELD_TEXT_COLOR,
+                    color: previewTextColor,
                   }}
                 />
                 <input
@@ -484,7 +568,7 @@ export function ProjectDetailPanel({ project }: { project: ProjectDetailData }) 
                     boxShadow: "0 0 0 1px var(--danger-border-focus)",
                     outline: "3px solid var(--danger-border-focus)",
                     outlineOffset: "2px",
-                    color: ERROR_FIELD_TEXT_COLOR,
+                    color: previewTextColor,
                   }}
                 />
               </div>

@@ -139,8 +139,9 @@ Keystone adds classes and elements you can style on your site:
 | `.keystone-field-invalid` | Invalid inputs (also sets `aria-invalid="true"`) |
 | `.keystone-field-error` | Inline error `<p>` inserted after the field |
 
-Invalid field background colors can be customized per project in the dashboard
-(WCAG AA contrast checked against the default error text color).
+Invalid field background, focus background, and optional text colors can be
+customized per project in the dashboard (WCAG AA contrast checked against both
+backgrounds).
 
 ## FAQ
 

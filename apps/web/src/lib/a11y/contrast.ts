@@ -141,3 +141,60 @@ export function suggestFocusBackground(
 export function formatContrastRatio(ratio: number): string {
   return `${ratio.toFixed(1)}:1`;
 }
+
+const TEXT_COLOR_CANDIDATES = [
+  ERROR_FIELD_TEXT_COLOR,
+  "#000000",
+  "#ffffff",
+  "#6b1a22",
+];
+
+function buildTextColorCandidates(): string[] {
+  const candidates = [...TEXT_COLOR_CANDIDATES];
+  for (let step = 0; step <= 255; step += 17) {
+    const channel = step.toString(16).padStart(2, "0");
+    candidates.push(`#${channel}${channel}${channel}`);
+  }
+  return candidates;
+}
+
+/**
+ * Pick a text color that meets WCAG AA against every background.
+ * Prefers the highest minimum contrast ratio across all backgrounds.
+ */
+export function suggestAccessibleTextColor(
+  backgrounds: string[],
+  minimum = WCAG_AA_CONTRAST_MIN,
+): string {
+  const normalizedBackgrounds = backgrounds
+    .map((background) => normalizeHexColor(background))
+    .filter(Boolean) as string[];
+
+  if (!normalizedBackgrounds.length) {
+    return ERROR_FIELD_TEXT_COLOR;
+  }
+
+  let bestPassing: { color: string; minRatio: number } | null = null;
+  let bestEffort: { color: string; minRatio: number } | null = null;
+
+  for (const candidate of buildTextColorCandidates()) {
+    const normalized = normalizeHexColor(candidate);
+    if (!normalized) continue;
+
+    const ratios = normalizedBackgrounds.map(
+      (background) => getContrastRatio(normalized, background) ?? 0,
+    );
+    const minRatio = Math.min(...ratios);
+    const entry = { color: normalized, minRatio };
+
+    if (!bestEffort || minRatio > bestEffort.minRatio) {
+      bestEffort = entry;
+    }
+
+    if (minRatio >= minimum && (!bestPassing || minRatio > bestPassing.minRatio)) {
+      bestPassing = entry;
+    }
+  }
+
+  return bestPassing?.color ?? bestEffort?.color ?? ERROR_FIELD_TEXT_COLOR;
+}
