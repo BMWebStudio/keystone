@@ -9,8 +9,10 @@
   "scripts": {
     "dev": "npm run dev --workspace=@keystone/web",
     "build": "npm run build --workspace=@keystone/core && npm run build --workspace=@keystone/web",
+    "typecheck": "npm exec --workspace=@keystone/web -- tsc --noEmit",
     "test": "npm run test --workspaces --if-present",
     "format": "prettier --write \"apps/**/*.{ts,tsx,js,jsx,css,json,md}\" \"packages/**/*.{ts,tsx,js,jsx,css,json,md}\" \"docs/**/*.{md,mdx}\" \"README.md\"",
+    "validate": "npm run typecheck && npm test && npm run build",
     "capture:area": "node scripts/capture.mjs area",
     "capture:fullscreen": "node scripts/capture.mjs fullscreen",
     "capture:window": "node scripts/capture.mjs window",
